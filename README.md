@@ -7,8 +7,11 @@ A Skript API based on skript-reflect that adds tons of new features to use!
 * [ThatPacketAddon](https://skripttools.net/dl/ThatPacketAddon+1.0-BETA.3.jar) - tested with 1.0-BETA.3
   * Optional: [WorldGuard](https://dev.bukkit.org/projects/worldguard/files) (for region name expression)
 
+## Releases
+You can download skToolBox from the [releases page](https://github.com/Mr-Darth/skToolBox/releases).
+
 ## Found a bug or you want to suggest something?
 Open an [issue](https://github.com/Mr-Darth/skToolBox/issues)!
 
 ## Want to contribute?
-Fork this repository and open a [pull request](https://github.com/Mr-Darth/skToolBox/pulls)
+Fork this repository and open a [pull request](https://github.com/Mr-Darth/skToolBox/pulls).
