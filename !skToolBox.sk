@@ -1464,12 +1464,7 @@ condition:
 		negate the condition if parse mark = 1
 		continue if (random item of expr-1).getType().isFuel() is true
 
-on fish:
-	broadcast "%fishing state% and %caught fish%"
-	broadcast "%(fishing state).hashCode()% and %(caught fish).hashCode()%"
-	if fishing state = caught fish:
-		broadcast "A"
-	set caught item to diamond if fishing state is caught fish
+
 
 #
 #   _______ _              ______           _  
