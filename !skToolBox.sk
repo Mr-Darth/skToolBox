@@ -51,6 +51,7 @@ import:
 	org.bukkit.block.data.Ageable as BlockDataAgeable
 	org.bukkit.inventory.meta.EnchantmentStorageMeta
 	org.bukkit.block.data.Levelled
+	org.bukkit.Raid
 	org.bukkit.Statistic
 	org.bukkit.inventory.ItemFlag
 	org.bukkit.Art
@@ -60,6 +61,7 @@ import:
 	org.bukkit.event.player.PlayerFishEvent$State as FishingState
 	org.bukkit.event.player.PlayerLoginEvent$Result as LoginResult
 	org.bukkit.event.entity.EntityRegainHealthEvent$RegainReason as RegainReason
+	org.bukkit.Raid$RaidStatus
 
 
 	ch.njol.skript.Skript
@@ -166,6 +168,12 @@ expression [[item] flag[s]] (hide|hidden) (0¦enchant[ment]s|1¦attributes|2¦un
 expression [(regain|heal)[ing] reason] (0¦regen[eration]|1¦satiated|2¦eating|3¦ender crystal|4¦magic|5¦magic regen[eration]|6¦wither spawn|7¦wither|8¦custom):
 	get:
 		return RegainReason.values()[parse mark]
+
+# Name: Raid statuses
+expression [raid status] (0¦ongoing|1¦victory|2¦loss|3¦stopped):
+	get:
+		return RaidStatus.values()[parse mark]
+
 
 #                                                             
 #                                    (_)                
@@ -1080,11 +1088,11 @@ inventory property inv[entory] size:
 # Description: Returns a random element from a list using the given chances.
 # Usage: give player random weighted object of {_loot::*} using the chances {_weights::*}
 expression random [weighted] (value|object|element) [out] of %objects% (using|with) [the] (chance|weight)s %numbers%:
-    get:
-        set {_r} to random number between 0 and sum(exprs-2)
-        loop size of exprs-2 times:
-            add (loop-number)th element of exprs-2 to {_c}
-            return (loop-number)th element of exprs-1 if {_c} >= {_r}
+	get:
+		set {_r} to random number between 0 and sum(exprs-2)
+		loop size of exprs-2 times:
+			add (loop-number)th element of exprs-2 to {_c}
+			return (loop-number)th element of exprs-1 if {_c} >= {_r}
 
 # Name: Block sounds
 # Description: Returns a specific sound of a block.
@@ -1127,8 +1135,132 @@ livingentity property breed(ability|ing [cap]ability):
 # Description: Returns the time until a given date.
 # Usage: set {remainingTime} to time until {restart}
 expression time until %date%:
-    get:
-        return try new Timespan(((unix timestamp of expr-1) - (unix timestamp of now)) * 1000)
+	get:
+		return try new Timespan(((unix timestamp of expr-1) - (unix timestamp of now)) * 1000)
+
+# Name: Last attacker
+# Description: Returns the last attacker of an entity.
+# Usage: give 10 diamonds to last attacker of victim
+entity property last (attacker|damager):
+	get:
+		return expr-1.getLastDamageCause().getDamager()
+
+# Name: Time lived
+# Description: Get or set the time lived of an entity.
+# Usage: give player 100 stone if time lived of player = 20 seconds
+entity property time lived:
+	get:
+		return try new Timespan(expr-1.getTicksLived() * 50)
+	set timespan:
+		expr-1.setTicksLived((change value).getTicks_i())
+
+# Name: Item cooldown
+# Description: Get or change the cooldown of a player for a certain item.
+# Usage: set player's cooldown for tool to 1 second
+player property cooldown for %item/itemtype%:
+	get:
+		return try new Timespan(expr-1.getCooldown((random item of expr-2).getType()))
+	set timespan:
+		expr-1.setCooldown((random item of expr-2).getType(), (change value).getTicks_i())
+
+# Name: Time slept
+# Description: Gets the time slept of a player. Resets on wake up.
+# Usage: send "%time slept of player-arg%"
+player property (sleep[ing] time|time slept):
+	get:
+		return try new Timespan(expr-1.getSleepTicks() * 50)
+
+# Name: Attack cooldown
+# Description: Gets the current cooldown for a player's attack. This is used to calculate damage, 
+#              with 1.0 representing a fully charged attack and 0.0 representing a non-charged attack
+# Usage: cancel event if attack cooldown of damager < 0.4
+player property attack cooldown:
+	get:
+		return expr-1.getAttackCooldown()
+
+# Name: Active raids 
+# Description: Gets a list of the active raids in a world.
+# Usage: set {_raid} to first element of raids of player's world
+plural world property [active] raids:
+	get:
+		return ...expr-1.getRaids()
+
+# Name: Active time of raid
+# Description: Gets the time a raid has been active for.
+# Usage: set {_time} to active time of {_raid}
+object property active time:
+	get:
+		return if expr-1 is not instance of Raid
+		return try new Timespan(expr-1.getActiveTicks() * 50)
+
+# Name: Bad omen level
+# Description: Gets the bad omen level of a raid.
+# Usage: broadcast "Ooop" if bad omen level of {_raid} > 2
+object property bad omen level:
+	get:
+		return if expr-1 is not instance of Raid
+		return expr-1.getBadOmenLevel()
+	set integer:
+		expr-1 is instance of Raid
+		try expr-1.setBadOmenLevel(change value)
+
+# Name: Raid location
+# Description: Gets the location of a raid.
+# Usage: spawn 1 iron golem at raid location of {_raid}
+object property ([village] raid[ing] location|location of [village] raid):
+	get:
+		return if expr-1 is not instance of Raid
+		return expr-1.getLocation()
+
+# Name: Raid heroes
+# Description: Gets a list of the heroes of a raid.
+# Usage: give heroes of {_raid} 1 diamond sword
+plural object property heroes:
+	get:
+		return if expr-1 is not instance of Raid
+		loop ...expr-1.getHeroes():
+			set {_r::%loop-value%} to "%loop-value%" parsed as player
+		return {_r::*}
+
+# Name: Raiders
+# Description: Gets a list of a raid's raiders.
+# Usage: set {_raiders::*} to raiders of {_raid}
+plural object property raiders:
+	get:
+		return if expr-1 is not instance of Raid
+		return ...expr-1.getRaiders()
+
+# Name: Raid status
+# Description: Gets the status of a raid.
+# Usage: broadcast "yayyyayayay" if status of {_raid} is victory
+object property [raid] status:
+	get:
+		return if expr-1 is not instance of Raid
+		return RaidStatus.values()[RaidStatus.ordinal(expr-1.getStatus())]
+
+# Name: Raid groups
+# Description: Returns the total or current amount of spawned raiding groups.
+# Usage: set {_total} to total groups of {_raid}
+object property (total|1¦spawned) [raiding] groups:
+	get:
+		return if expr-1 is not instance of Raid
+		return (expr-1.getTotalGroups() if parse mark != 1, else expr-1.getSpawnedGroups())
+
+# Name: Raid health
+# Description: Gets the sum of all raiders' healths.
+# Usage: set {_h} to total health of {_raid}
+object property [total] health:
+	get:
+		return if expr-1 is not instance of Raid
+		return expr-1.getTotalHealth() / 2
+
+# Name: Raid wave count
+# Description: Returns the amount of waves of a raid.
+# Usage: set {_am} to total wave count of {_raid}
+object property [total] wave(s| count):
+	get:
+		return if expr-1 is not instance of Raid
+		return expr-1.getTotalWaves()
 
 #         __  __          _       
 #        / _|/ _|        | |      
@@ -1141,7 +1273,7 @@ expression time until %date%:
 # Name: Make players swing
 # Description: Force certain players to swing their arms for other players.
 # Usage: make player swing for targeted player
-effect (make|force) %player% swing [[(with|using) [the]] ([main ]hand|1¦off[ ]hand)] [for %-players%]:
+effect (make|force) %player% [to] swing [[(with|using) [the]] ([main ]hand|1¦off[ ]hand)] [for %-players%]:
 	trigger:
 		set {_packet} to new play_server_animation packet
 		set int field 0 of {_packet} to expr-1.getEntityId()
@@ -1347,6 +1479,29 @@ effect splice %~objects% (at|by) [index] %integer%:
 				set {_r::%{_i}%} to loop-value
 		(raw exprs-1).change(event, {_r::*} and ChangeMode.SET)
 
+# Name: Force player to sleep
+# Description: Makes a player sleep at a given location as long as there is a bed
+#              at the given location.
+# Usage: make player sleep at {_bed}
+effect (force|make) %player% [to] sleep at %location%:
+	trigger:
+		expr-1.sleep(expr-2, true)
+
+# Name: Force player to wake up
+# Description: Makes a player wake up, with or without setting their spawnpoint
+#              at the bed they're in.
+# Usage: force player to wake up
+effect (force|make) %player% [to] wake[ ]up [(1¦and set spawn[[ ]point])]:
+	trigger:
+		try expr-1.wakeup(true if parse mark = 1, else false)
+
+# Name: Refresh chunk
+# Description: Refreshes a chunk.
+# Usage: refresh chunk at player
+effect (reload|refresh) %chunk%:
+	trigger:
+		expr-1.getWorld().refreshChunk(expr-1.getX(), expr-1.getZ())
+
 #                       _ _ _   _                 
 #                      | (_) | (_)                
 #    ___ ___  _ __   __| |_| |_ _  ___  _ __  ___ TM
@@ -1472,8 +1627,17 @@ condition:
 		negate the condition if parse mark = 1
 		continue if (random item of expr-1).getType().isFuel() is true
 
+# Name: Raid started
+# Description: Checks if a raid started or not.
+# Usage: if {_raid} is active:
+condition %object% is[(1¦(n't| not))] (active|started):
+	check:
+		expr-1 is instance of Raid
+		negate the condition if parse mark = 1
+		continue if expr-1.isStarted() = true
 
-	
+
+
 #
 #   _______ _              ______           _  
 #  |__   __| |            |  ____|         | | 
