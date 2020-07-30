@@ -628,7 +628,7 @@ expression midnight:
 # Name: Regex split
 # Description: Splits a string by a regex.
 # Usage: set {_i} to regex split {info} at "\d{5}"
-expression:
+plural expression:
 	patterns:
 		regex split %string% (at|by|using) [[the] delimiter] %string%
 		%string% regex split (at|by|using) [[the] delimiter] %string%
@@ -1261,6 +1261,13 @@ object property [total] wave(s| count):
 	get:
 		return if expr-1 is not instance of Raid
 		return expr-1.getTotalWaves()
+
+# Name: Origin
+# Description: Returns the location where the entity originates from.
+# Usage: teleport victim to victim's origin
+entity property origin:
+	get:
+		return expr-1.getOrigin()
 
 #         __  __          _       
 #        / _|/ _|        | |      
