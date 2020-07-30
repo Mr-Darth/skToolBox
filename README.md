@@ -9,7 +9,7 @@ A Skript API based on skript-reflect that adds tons of new features to use!
 ## Releases
 You can download skToolBox from the [releases page](https://github.com/Mr-Darth/skToolBox/releases).
 
-## Found a bug or you want to suggest something?
+## Got an issue or want to suggest something?
 Open an [issue](https://github.com/Mr-Darth/skToolBox/issues)!
 
 ## Want to contribute?
