@@ -30,7 +30,7 @@ options:
 
 
 
-	version: 1.0-BETA.1
+	version: 1.0-BETA.2
 
 import:
 
@@ -295,14 +295,6 @@ expression [the] [fish[ing]] hook:
 	delete:
 		event.getHook().remove()
 
-# Name: Region name
-# Description: Returns the name of a region.
-# Usage: cancel event if name of region at player is "spawn"
-# Note: Requires WorldGuard
-region property name:
-	get:
-		return first element out of split "%expr-1%" at " "
-
 # Name: Pi
 # Description: Returns the value of pi.
 # Usage: set {_variable} to pi*2
@@ -322,6 +314,17 @@ expression:
 		e[uler['s] [num[ber]]]['s value]
 	get:
 		return Math.E
+
+# Name: Phi
+# Description: Returns the value of phi (the golden ratio).
+# Usage: set {_e} to {_l} - phi
+expression:
+	patterns:
+		[value of] phi
+		phi['s value]
+		[the] golden ratio
+	get:
+		return (sqrt(5) + 1) / 2
 
 # Name: Degrees to radians
 # Description: Converts degrees to radians.
@@ -579,10 +582,10 @@ expression char[acter] at [(index|position)] %integer% in %string%:
 	set string:
 		set {_sb} to try new StringBuilder(expr-2)
 		try {_sb}.setCharAt((expr-1) - 1 and "%change value%")
-		try (raw expr-2).change(event, [{_sb}.toString()] and ChangeMode.SET)
+		set raw expr-2 to {_sb}.toString()
 	delete:
 		set {_sb} to try new StringBuilder(expr-2).deleteCharAt((expr-1) - 1)
-		try (raw expr-2).change(event, [{_sb}.toString()] and ChangeMode.SET)
+		set raw expr-2 to {_sb}.toString()
 
 # Name: Integers with base
 # Description: Returns the values of the given integers in a system with radix N.
@@ -1120,6 +1123,13 @@ livingentity property breed(ability|ing [cap]ability):
 	set boolean:
 		try expr-1.setBreed(change value)
 
+# Name: Time until
+# Description: Returns the time until a given date.
+# Usage: set {remainingTime} to time until {restart}
+expression time until %date%:
+    get:
+        return try new Timespan(((unix timestamp of expr-1) - (unix timestamp of now)) * 1000)
+
 #         __  __          _       
 #        / _|/ _|        | |      
 #    ___| |_| |_ ___  ___| |_ ___ TM
@@ -1211,22 +1221,20 @@ effect (stop|cancel|deny) %livingentity% (to|from) pathfind[ing]:
 # Credits: Blueyescat
 effect %number%[ ](1¦++|--):
 	parse:
-		if ChangerUtils.acceptsChange(expr-1, (ChangeMode.ADD if parse mark is 1, else ChangeMode.REMOVE) and number) is true:
-			continue
+		continue if ChangerUtils.acceptsChange(expr-1, (ChangeMode.ADD if parse mark is 1, else ChangeMode.REMOVE) and number) is true	
 		Skript.error("'%expr-1%' can't be %(""increased"") if parse mark is 1, else ""decreased""%")
 	trigger:
-		(raw expr-1).change(event, [1] and (ChangeMode.ADD if parse mark is 1, else ChangeMode.REMOVE))
+		set raw expr-1 to expr-1 + (1 if parse mark = 1, else -1)
 
 # Name: Regex replace
 # Description: Replace all of the occurrences of a regex pattern in a string.
 # Usage: regex replace all "\d" with "" in {_description}
 effect regex replace [all] %string% with %string% in %~string%:
 	parse:
-		if ChangerUtils.acceptsChange(expr-3, ChangeMode.SET and text) is true:
-			continue
+		continue if ChangerUtils.acceptsChange(expr-3, ChangeMode.SET and text) is true	
 		Skript.error("'%expr-3%' can't be changed")
 	trigger:
-		(raw expr-3).change(event, [(expr-3.replaceAll(expr-1 and expr-2))] and ChangeMode.SET)
+		set raw expr-3 to expr-3.replaceAll(expr-1 and expr-2)
 
 # Name: Make entity look at location
 # Description: Makes an entity look at a certain location.
@@ -1465,7 +1473,7 @@ condition:
 		continue if (random item of expr-1).getType().isFuel() is true
 
 
-
+	
 #
 #   _______ _              ______           _  
 #  |__   __| |            |  ____|         | | 
