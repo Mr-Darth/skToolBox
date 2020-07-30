@@ -6,8 +6,6 @@ A Skript API based on skript-reflect that adds tons of new features to use!
 * [skript-reflect](https://github.com/TPGamesNL/skript-reflect/actions) - tested with 2.0.0-SNAPSHOT
 * [ThatPacketAddon](https://skripttools.net/dl/ThatPacketAddon+1.0-BETA.3.jar) - tested with 1.0-BETA.3
 
-  * Optional: [WorldGuard](https://dev.bukkit.org/projects/worldguard/files) (for region name expression)
-
 ## Releases
 You can download skToolBox from the [releases page](https://github.com/Mr-Darth/skToolBox/releases).
 
