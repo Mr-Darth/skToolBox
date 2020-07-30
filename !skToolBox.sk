@@ -525,7 +525,7 @@ plural expression:
 		corners of [a] square (at|from) [center] %location% [(with|and)] size %int%
 		square corners (at|from) [center] %location% [(with|and)]] size %int%
 	get:
-		set {_l::*} to (((x-coord of expr-1)-(expr-2)), ((x-coord of expr-1)+(expr-2)), ((z-coord of expr-1)-(expr-2)) and ((z-coord of expr-1)+(expr-2)))
+		set {_l::*} to (((x-coord of expr-1) - (expr-2)), ((x-coord of expr-1) + (expr-2)), ((z-coord of expr-1) - (expr-2)) and ((z-coord of expr-1) + (expr-2)))
 		set {_c::*} to ((location at {_l::1}, (y-coord of expr-1), {_l::4} in (expr-1's world)), (location at {_l::1}, (y-coord of expr-1), {_l::3} in (expr-1's world)), (location at {_l::2}, (y-coord of expr-1), {_l::3} in (expr-1's world)) and (location at {_l::2}, (y-coord of expr-1), {_l::4} in (expr-1's world)))
 		return {_c::*}
 
@@ -1239,9 +1239,9 @@ effect regex replace [all] %string% with %string% in %~string%:
 # Name: Make entity look at location
 # Description: Makes an entity look at a certain location.
 # Usage: make last spawned armorstand look at {_target}
-effect (make|force) %livingentity% (look|face) (at|to[wards]) %location%:
+effect (make|force) %livingentity% (look (at|to[wards])|face) %location%:
 	trigger:
-		teleport expr-1 to expr-1.getLocation().setDirection(vector from expr-2 -- vector from expr-1)
+		teleport expr-1 to expr-1.getLocation().setDirection(vector from expr-1 to expr-2)
 
 # Name: Open or close chest
 # Description: Makes a chest appear as opened or closed.
