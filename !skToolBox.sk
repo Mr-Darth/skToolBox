@@ -485,7 +485,7 @@ integer property ordinal [value]:
 # Usage: send "Current version: %text from ""{@url}""%"
 plural expression (text|string|content[s]) (of|from) [(url|link|website)] %string%:
 	get:
-		set {_br} to try new BufferedReader(new InputStreamReader(new URL(expr-1).openStream()))
+		set {_br} to try new BufferedReader(try new InputStreamReader(try new URL(expr-1).openStream()))
 		set {_r::*} to ...try {_br}.lines()
 		try {_br}.close()
 		return {_r::*}
@@ -1269,6 +1269,13 @@ entity property origin:
 	get:
 		return expr-1.getOrigin()
 
+# Name: Common elements
+# Description: Returns a list with the common objects of two lists.
+# Usage: remove common elements of {t::*} and {j::*} from {d::*}
+plural expression common (objects|elements|values) of %objects% and %objects%:
+	get:
+		return exprs-1 where [exprs-2 contains input]
+
 #         __  __          _       
 #        / _|/ _|        | |      
 #    ___| |_| |_ ___  ___| |_ ___ TM
@@ -1358,12 +1365,12 @@ effect (stop|cancel|deny) %livingentity% (to|from) pathfind[ing]:
 # Description: Increase or decrease a variable by 1.
 # Usage: {level}++
 # Credits: Blueyescat
-effect %number%[ ](1¦++|--):
+effect %number%[ ](1¦++|-1¦--):
 	parse:
 		continue if ChangerUtils.acceptsChange(expr-1, (ChangeMode.ADD if parse mark is 1, else ChangeMode.REMOVE) and number) is true	
 		Skript.error("'%expr-1%' can't be %(""increased"") if parse mark is 1, else ""decreased""%")
 	trigger:
-		set raw expr-1 to expr-1 + (1 if parse mark = 1, else -1)
+		set raw expr-1 to expr-1 + parse mark
 
 # Name: Regex replace
 # Description: Replace all of the occurrences of a regex pattern in a string.
