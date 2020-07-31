@@ -30,7 +30,7 @@ options:
 
 
 
-	version: 1.0-BETA.2
+	version: 1.0-BETA.3
 
 import:
 
@@ -1276,6 +1276,16 @@ plural expression common (objects|elements|values) of %objects% and %objects%:
 	get:
 		return exprs-1 where [exprs-2 contains input]
 
+# Name: Random location
+# Description: Returns a random location between two points.
+# Usage: set block at random location between player and {_ta} to diamond block
+expression random location (between|within|from) %location% (to|and) %location%:
+	get:
+		set {_x} to random number from min(expr-1's x-pos and expr-2's x-pos) to max(expr-1's x-pos and expr-2's x-pos)
+		set {_y} to random number from min(expr-1's y-pos and expr-2's y-pos) to max(expr-1's y-pos and expr-2's y-pos)
+		set {_z} to random number from min(expr-1's z-pos and expr-2's z-pos) to max(expr-1's z-pos and expr-2's z-pos)
+		return location at {_x}, {_y}, {_z} in expr-1's world
+
 #         __  __          _       
 #        / _|/ _|        | |      
 #    ___| |_| |_ ___  ___| |_ ___ TM
@@ -1540,20 +1550,11 @@ condition:
 			stop if mod({_n}, expr-2) != 0
 		continue
 
-# Name: Inventory is full
-# Description: Checks if an inventory is full or not.
-# Usage: give player diamond if player's inventory is not full
-condition %inventory% (is|1¦is(n't| not)) full:
-	check:
-		negate the condition if parse mark = 1
-		continue if expr-1 cannot hold 1 cake
-
 # Name: Inventory is completley filled
 # Description: Checks if an inventory can hold any item.
 # Usage: send "FULL" if player's inventory is completley filled
-condition %inventory% (is|1¦is(n't| not)) completley (full|filled):
+inventory property condition completley (full|filled):
 	check:
-		negate the condition if parse mark = 1
 		continue if (slots (integers from 0 to (expr-1.getSize() if holder of expr-1 is not a player, else 36) - 1) of expr-1 where [item amount of input != max stack size of input]) is not set
 
 # Name: String exactly equals
@@ -1585,17 +1586,15 @@ condition %string% [(1¦does(n't| not))] regex match[es] %string%:
 # Name: Location is within border
 # Description: Checks if a location is within the world border.
 # Usage: stop if {_} is not within worldborder
-condition %location% (is|1¦is(n't| not)) (within|inside) [the] world[(-| )]border:
+location property condition (within|inside) [the] world[(-| )]border:
 	check:
-		negate the condition if parse mark = 1
 		continue if expr-1.getWorld().getWorldBorder().isInside(expr-1) = true
 
 # Name: Number is prime
 # Description: Checks if the given integer is a prime number.
 # Usage: set {_fancyMaths} to (sqrt({_n})) + (log({_n} / ln({_n}))) if {_n} is prime
-condition %integer% is[(1¦(n't| not))] [a] prime [(num[ber]|int[eger])]:
+integer property condition prime [number]:
 	check:
-		negate the condition if parse mark = 1
 		while ({_c} ? 2) <= sqrt(expr-1):
 			stop if mod(expr-1, ({_c} ? 2)) = 0
 			set {_c} to ({_c} ? 2) + 1
@@ -1605,9 +1604,8 @@ condition %integer% is[(1¦(n't| not))] [a] prime [(num[ber]|int[eger])]:
 # Description: Checks if a block is passable.
 #              A block is passable if it has no colliding parts that would prevent players from moving through it.
 # Usage: if event-block is passable:
-condition %block% is[(1¦(n't| not))] passable:
+block property condition passable:
 	check:
-		negate the condition if parse mark = 1
 		continue if expr-1.isPassable() is true
 	
 # Name: Entity has path
@@ -1625,9 +1623,8 @@ condition %livingentity% has[(1¦(n't| not))] [got] [a] path:
 # Name: Chunk is slime chunk
 # Description: Checks if a chunk is a slime chunk.
 # Usage: if event-chunk is a slime chunk:
-condition %chunk% is[(1¦(n't| not))] [a] slime chunk:
+chunk property condition slime(y| chunk):
 	check:
-		negate the condition if parse mark = 1
 		continue if expr-1.isSlimeChunk() is true
 
 # Name: Item is fuel
@@ -1636,7 +1633,7 @@ condition %chunk% is[(1¦(n't| not))] [a] slime chunk:
 condition:
 	patterns:
 		%itemtype/item% is[(1¦(n't| not))] fuel
-		%itemtype/item% can[(1¦('t|not))] be [used as] fuel
+		%itemtype/item% can[(1¦('t|not))] be used as fuel
 	check:
 		negate the condition if parse mark = 1
 		continue if (random item of expr-1).getType().isFuel() is true
@@ -1644,12 +1641,20 @@ condition:
 # Name: Raid started
 # Description: Checks if a raid started or not.
 # Usage: if {_raid} is active:
-condition %object% is[(1¦(n't| not))] (active|started):
+object property condition (active|started):
 	check:
 		expr-1 is instance of Raid
-		negate the condition if parse mark = 1
 		continue if expr-1.isStarted() = true
 
+# Name: Location is within
+# Description: Checks if a location is within two points.
+# Usage: if player's location is within {_pos} and {spawnPoint}
+location property condition (within|between) %location% and %location%:
+	check:
+		expr-1's x-pos is between min(expr-2's x-pos and expr-3's x-pos) and max(expr-2's x-pos and expr-3's x-pos)
+		expr-1's y-pos is between min(expr-2's y-pos and expr-3's y-pos) and max(expr-2's y-pos and expr-3's y-pos)
+		expr-1's z-pos is between min(expr-2's z-pos and expr-3's x-pos) and max(expr-2's x-pos and expr-3's x-pos)
+		continue
 
 
 #
