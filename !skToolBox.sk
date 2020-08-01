@@ -986,6 +986,12 @@ plural expression [the] (1¦(highest|top|greatest)|(lowest|last|smallest)) %inte
 		loop ...Variables.getVariable((raw expr-2).getName().toString(event), event and (raw expr-2).isLocal()).entrySet():
 			add 1 to {_i}
 			set {_sort::%loop-value.getValue()%.%{_i}%} to expr-3.replace("@index" and "%loop-value.getKey()%").replace("@value" and "%loop-value.getValue()%")
+		if expr-3 contains "@place":
+			set {_in} to (1 if parse mark != 1, else -1)
+			set {_p} to (size of {_sort::*} if parse mark = 1, else 1)
+			loop {_sort::*}:
+				set {_sort::%loop-index%} to loop-value.replace("@place" and "%{_p}%")
+				add {_in} to {_p}
 		return the first expr-1 elements of ((reversed {_sort::*}) if parse mark = 1, else {_sort::*})
 
 # Name: Painting art
