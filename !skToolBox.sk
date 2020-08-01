@@ -60,7 +60,6 @@ import:
 	org.bukkit.entity.Horse$Style as HorseStyle
 	org.bukkit.event.player.PlayerFishEvent$State as FishingState
 	org.bukkit.event.player.PlayerLoginEvent$Result as LoginResult
-	org.bukkit.event.entity.EntityRegainHealthEvent$RegainReason as RegainReason
 	org.bukkit.Raid$RaidStatus
 
 
@@ -164,11 +163,6 @@ expression [[item] flag[s]] (hide|hidden) (0¦enchant[ment]s|1¦attributes|2¦un
 	get:
 		return ItemFlag.values()[parse mark]
 
-# Name: Regain reasons
-expression [(regain|heal)[ing] reason] (0¦regen[eration]|1¦satiated|2¦eating|3¦ender crystal|4¦magic|5¦magic regen[eration]|6¦wither spawn|7¦wither|8¦custom):
-	get:
-		return RegainReason.values()[parse mark]
-
 # Name: Raid statuses
 expression [raid status] (0¦ongoing|1¦victory|2¦loss|3¦stopped):
 	get:
@@ -188,7 +182,7 @@ expression [raid status] (0¦ongoing|1¦victory|2¦loss|3¦stopped):
 # Name: Opposite numbers
 # Description: Returns the opposite value of the inputted numbers.
 #              Inputting (-1 and 29.3) will return (1 and -29.3).
-# Usage: set {_opposite} to opposite integer of 10
+# Usage: set {_opposite} to opposite number of 10
 plural expression (opposite|reverse) [number[s] [(of|from)]] %numbers%:
 	get:
 		loop exprs-1:
@@ -204,20 +198,6 @@ plural expression (opposite|reverse) [number[s] [(of|from)]] %numbers%:
 expression ((opposite|toggled) [boolean ]|not |!)%boolean%:
 	get:
 		return (false if expr-1 is true, else true)
-
-# Name: Hit block
-# Description: Returns the hit block in the projectile hit event.
-# Usage: set hit block to air
-expression [the] (hit|sho[o]t[ed]) block:
-	parse:
-		continue if ScriptLoader.isCurrentEvent(class "org.bukkit.event.entity.ProjectileHitEvent") = true    
-		Skript.error("Cannot use 'hit block' outside of the projectile hit event" and ErrorQuality.SEMANTIC_ERROR)
-	get:
-		return event.getHitBlock()
-	set itemtype:
-		set block at event.getHitBlock().getLocation() to change value
-	delete:
-		set block at event.getHitBlock().getLocation() to air
 
 # Name: All plugins
 # Description: Returns a list with the name of all the running plugins on the server.
@@ -536,16 +516,6 @@ plural expression:
 		set {_l::*} to (((x-coord of expr-1) - (expr-2)), ((x-coord of expr-1) + (expr-2)), ((z-coord of expr-1) - (expr-2)) and ((z-coord of expr-1) + (expr-2)))
 		set {_c::*} to ((location at {_l::1}, (y-coord of expr-1), {_l::4} in (expr-1's world)), (location at {_l::1}, (y-coord of expr-1), {_l::3} in (expr-1's world)), (location at {_l::2}, (y-coord of expr-1), {_l::3} in (expr-1's world)) and (location at {_l::2}, (y-coord of expr-1), {_l::4} in (expr-1's world)))
 		return {_c::*}
-
-# Name: Regain reason
-# Description: Returns the regain reason in the heal event.
-# Usage: cancel event if regain reason = "satiated"
-expression [the] (heal[ing]|regain|regen[eration]) (cause|reason):
-	parse:
-		continue if ScriptLoader.isCurrentEvent(class "org.bukkit.event.entity.EntityRegainHealthEvent") = true 
-		Skript.error("Cannot use 'heal reason' outside of the heal event" and ErrorQuality.SEMANTIC_ERROR)
-	get:
-		return RegainReason.values()[RegainReason.ordinal(event.getRegainReason())]
 
 # Name: Expressible conditions
 # Description: Returns the result of a condition.
@@ -1655,6 +1625,7 @@ location property condition (within|between) %location% and %location%:
 		expr-1's y-pos is between min(expr-2's y-pos and expr-3's y-pos) and max(expr-2's y-pos and expr-3's y-pos)
 		expr-1's z-pos is between min(expr-2's z-pos and expr-3's x-pos) and max(expr-2's x-pos and expr-3's x-pos)
 		continue
+
 
 
 #
