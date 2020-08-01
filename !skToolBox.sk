@@ -1262,6 +1262,22 @@ expression random location (between|within|from) %location% (to|and) %location%:
 		set {_z} to random number from min(expr-1's z-pos and expr-2's z-pos) to max(expr-1's z-pos and expr-2's z-pos)
 		return location at {_x}, {_y}, {_z} in expr-1's world
 
+# Name: Hyperbolic cosine/sine/tangent
+# Description: Returns the hyperbolic cosine/sine/tangent of a number.
+# Usage: set {_tanh} to hyperbolic tan of {_v}
+number property hyperbolic (1¦cos[ine]|2¦sin[e]|tan[gent]):
+	get:
+		return Math.cosh(expr-1) if parse mark = 1
+		return Math.sinh(expr-1) if parse mark = 2
+		return Math.tanh(expr-1) 
+
+# Name: Nth number of the Fibonacci sequence
+# Description: Returns the Nth number of the Fibonacci sequence.
+# Usage: set {_newPrice} to (player's level)th number of the fibonacci sequence
+expression [the] %integer%(st|nd|rd|th) (term|number) (of|from) [the] fibonacci sequence:
+    get:
+        return round((((sqrt(5) + 1) / 2) ^ expr-1) / sqrt(5))
+
 #         __  __          _       
 #        / _|/ _|        | |      
 #    ___| |_| |_ ___  ___| |_ ___ TM
