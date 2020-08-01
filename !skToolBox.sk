@@ -557,9 +557,9 @@ expression:
 		check [if] <(.+)>
 		output (from|of) [[the] condition] <(.+)>
 	parse:
-		continue if Condition.parse("%regex-1%" and "Can't understand this condition: %regex-1%") is set
-	get:
 		set {_condition} to Condition.parse("%regex-1%" and "Can't understand this condition: %regex-1%")
+		continue if {_condition} is set
+	get:
 		return {_condition}.check(event)        
 
 # Name: Rounded numbers to N decimal places
