@@ -526,6 +526,7 @@ expression:
 		[if] <(.+)>?
 		check [if] <(.+)>
 		output (from|of) [[the] condition] <(.+)>
+		whether <(.+)>
 	parse:
 		set {_condition} to Condition.parse("%regex-1%" and "Can't understand this condition: %regex-1%")
 		continue if {_condition} is set
@@ -1274,7 +1275,7 @@ number property hyperbolic (1¦cos[ine]|2¦sin[e]|tan[gent]):
 # Name: Nth number of the Fibonacci sequence
 # Description: Returns the Nth number of the Fibonacci sequence.
 # Usage: set {_newPrice} to (player's level)th number of the fibonacci sequence
-expression [the] %integer%(st|nd|rd|th) (term|number) (of|from) [the] fibonacci sequence:
+expression [the] %integer%(st|nd|rd|th) (term|number) (of|from) [the] fibonacci (sequence|series):
     get:
         return round((((sqrt(5) + 1) / 2) ^ expr-1) / sqrt(5))
 
@@ -1303,7 +1304,7 @@ effect (make|force) %player% [to] swing [[(with|using) [the]] ([main ]hand|1¦of
 effect (eval[uate]|execute) %strings%:
 	trigger:
 		loop exprs-1:
-			try TriggerItem.walk(Effect.parse(loop-expression and null) and event)
+			TriggerItem.walk(Effect.parse("%loop-value%", null) and event)
 
 # Name: Make entity damage entity
 # Description: Make an entity damage another entity
