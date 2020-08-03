@@ -84,6 +84,14 @@ import:
 	org.apache.commons.lang3.RandomStringUtils
 	org.apache.commons.codec.language.Soundex
 
+	com.boydti.fawe.FaweAPI
+	com.boydti.fawe.util.EditSessionBuilder
+	com.sk89q.worldedit.world.block.BaseBlock
+	com.sk89q.worldedit.math.BlockVector3
+	com.sk89q.worldedit.regions.CuboidRegion
+	com.sk89q.worldedit.bukkit.BukkitAdapter
+	com.sk89q.worldedit.function.pattern.BlockPattern
+
 #
 #       _                           _                              _               _             
 #      | |                         | |                            | |             | |                         
@@ -1290,11 +1298,11 @@ expression [the] %integer%(st|nd|rd|th) (term|number) (of|from) [the] fibonacci 
 # Name: Make players swing
 # Description: Force certain players to swing their arms for other players.
 # Usage: make player swing for targeted player
-effect (make|force) %player% [to] swing [[(with|using) [the]] ([main ]hand|1¦off[ ]hand)] [for %-players%]:
+effect (make|force) %player% [to] swing [[(with|using) [the]] (0¦[main ]hand|3¦off[ ]hand)] [for %-players%]:
 	trigger:
 		set {_packet} to new play_server_animation packet
 		set int field 0 of {_packet} to expr-1.getEntityId()
-		set int field 1 of {_packet} to (3 if parse mark = 1, else 0)
+		set int field 1 of {_packet} to parse mark
 		send exprs-2 ? all players packet {_packet}
 
 # Name: Evaluate
@@ -1395,13 +1403,13 @@ effect (make|force) %livingentity% (look (at|to[wards])|face) %location%:
 # Name: Open or close chest
 # Description: Makes a chest appear as opened or closed.
 # Usage: make event-block look opened for all players in radius 3 of event-location
-effect make %block% (appear|show|look) [as] (open[ed]|1¦close[d]) [for %-players%]:
+effect make %block% (appear|show|look) [as] (0¦close[d]|1¦open[ed]) [for %-players%]:
 	trigger:
 		set {_packet} to new play_server_block_action packet
 		set location field 0 of {_packet} to location of expr-1
 		set block field 0 of {_packet} to type of expr-1
 		set int field 0 of {_packet} to 1
-		set int field 1 of {_packet} to (0 if parse mark = 1, else 1)
+		set int field 1 of {_packet} to parse mark
 		send (exprs-2 ? all players) packet {_packet}
 
 # Name: Rotate a player
@@ -1518,6 +1526,21 @@ effect (force|make) %player% [to] wake[ ]up [(1¦and set spawn[[ ]point])]:
 effect (reload|refresh) %chunk%:
 	trigger:
 		expr-1.getWorld().refreshChunk(expr-1.getX(), expr-1.getZ())
+
+# Name: Async set blocks
+# Description: Sets the blocks between two points asynchronously.
+# Usage: async set blocks from {p1} to {p2} to dirt
+# Note: Requires FastAsyncWorldEdit (FAWE)
+effect async set [(all [[of] the]|the)] blocks (from|within|between) %location% (to|and) %location% to %itemtype%:
+	parse:
+		continue if server.getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") is set
+	trigger:
+		set {_editSession} to new EditSessionBuilder(FaweAPI.getWorld("%world of expr-1%")).fastmode(true).build()
+		set {_pos1} to BlockVector3.at(floor(x-pos of expr-1), floor(y-pos of expr-1), floor(z-pos of expr-1))
+		set {_pos2} to BlockVector3.at(floor(x-pos of expr-2), floor(y-pos of expr-2), floor(z-pos of expr-2))
+		set {_region} to new CuboidRegion({_pos1}, {_pos2}) 
+		set {_baseBlock} to new BlockPattern(new BaseBlock(BukkitAdapter.asBlockState(random item of expr-3)))
+		await {_editSession}.setBlocks({_region}, {_baseBlock})
 
 #                       _ _ _   _                 
 #                      | (_) | (_)                
