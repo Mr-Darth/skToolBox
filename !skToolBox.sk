@@ -47,6 +47,7 @@ import:
 	java.util.regex.Matcher
 	java.lang.management.ManagementFactory
 	java.lang.management.RuntimeMXBean
+	java.io.File
 
 	org.bukkit.Bukkit
 	org.bukkit.map.MinecraftFont	
@@ -63,6 +64,12 @@ import:
 	org.bukkit.event.player.PlayerFishEvent$State as FishingState
 	org.bukkit.event.player.PlayerLoginEvent$Result as LoginResult
 	org.bukkit.Raid$RaidStatus
+	org.bukkit.inventory.ShapelessRecipe
+	org.bukkit.inventory.ShapedRecipe
+	org.bukkit.inventory.CookingRecipe
+	org.bukkit.inventory.MerchantRecipe
+	org.bukkit.inventory.StonecuttingRecipe
+	org.bukkit.inventory.meta.Repairable
 
 
 	ch.njol.skript.Skript
@@ -994,7 +1001,7 @@ livingentity property pick[ ]up (state|[cap]ability):
 # Description: Sorts a list with a custom output.
 # Usage: set {_top10} to the highest 10 values of {kills::*} formatted as "[] @index has @value kills []"
 # Note: Requires the `Elements of` expression.
-plural expression [the] (1¦(highest|top|greatest)|(lowest|last|smallest)) %integer% (values|elements|objects) [out] of %~objects% (with format|formatted [as]) %string%:
+plural expression [the] (1¦(highest|top|greatest)|(lowest|smallest)) %integer% (values|elements|objects) [out] of %~objects% (with format|formatted [as]) %string%:
 	get:
 		loop ...Variables.getVariable((raw expr-2).getName().toString(event), event and (raw expr-2).isLocal()).entrySet():
 			add 1 to {_i}
@@ -1307,6 +1314,47 @@ expression [server] uptime:
 	get:
 		return new Timespan(ManagementFactory.getRuntimeMXBean().getUptime())
 
+# Name: Tile entities of chunk
+# Description: Returns a list of the tile entities in a chunk.
+# Usage: loop tile entities of event-chunk:
+plural chunk property [all] tile entities:
+	get:
+		loop ...expr-1.getTileEntities():
+			add 1 to {_i}
+			set {_r::%{_i}%} to block at loop-value.getLocation()
+		return {_r::*}
+
+# Name: Loaded chunks
+# Description: Returns the loaded chunks of a world.
+# Usage: set {_c} to random element of loaded chunks of player's world
+plural world property [all] loaded chunks:
+	get:
+		return ...expr-1.getLoadedChunks()
+
+# Name: Sleeping ignored 
+# Description: Get or change if the player will be ignored when sleeping.
+# Usage: set sleeping ignored of all players to true
+players property (ignore[d] sleep[ing]|sleep[ing] ignored) [state]:
+	get:
+		loop exprs-1:
+			set {_r::%loop-expression%} to loop-expression.isSleepingIgnored()
+		return {_r::*}
+	set boolean:
+		loop exprs-1:
+			loop-expression.setSleepingIgnored(change value)
+
+# Name: Item recipe ingredients
+# Description: Get a list with all the items needed to craft the given item.
+# Usage: set {_i::*} to recipe ingredients of chest
+plural itemtype property [(craft[ing]|recipe)] ingredients:
+	get:
+		set {_recipe} to try server.getServer().getRecipesFor(random item of expr-1).get(0)
+		return if exception exists
+		return ...{_recipe}.getIngredientList() if {_recipe} is instance of ShapelessRecipe
+		return ...{_recipe}.getIngredientMap().values() if {_recipe} is instance of ShapedRecipe
+		return ...{_recipe}.getIngredients() if {_recipe} is instance of MerchantRecipe
+		return {_recipe}.getInput() if {_recipe} is instance of CookingRecipe or StonecuttingRecipe
+
 #         __  __          _       
 #        / _|/ _|        | |      
 #    ___| |_| |_ ___  ___| |_ ___ TM
@@ -1540,18 +1588,21 @@ effect (force|make) %player% [to] wake[ ]up [(1¦and set spawn[[ ]point])]:
 	trigger:
 		try expr-1.wakeup(true if parse mark = 1, else false)
 
-# Name: Refresh chunk
-# Description: Refreshes a chunk.
+# Name: Refresh chunks
+# Description: Refreshes the given chunks asynchronously.
 # Usage: refresh chunk at player
-effect (reload|refresh) %chunk%:
+effect (reload|refresh) [chunk[s]] %chunks%:
 	trigger:
-		expr-1.getWorld().refreshChunk(expr-1.getX(), expr-1.getZ())
+		create new section with {_c::*} and store it in {_s}:
+			loop {_c::*}:
+				try loop-value.getWorld().refreshChunk(loop-value.getX(), loop-value.getZ())
+		run section {_s} async with exprs-1
 
 # Name: Async set blocks
 # Description: Sets the blocks between two points asynchronously.
 # Usage: async set blocks from {p1} to {p2} to dirt
 # Note: Requires FastAsyncWorldEdit (FAWE)
-effect async set [(all [[of] the]|the)] blocks (from|within|between) %location% (to|and) %location% to %itemtype%:
+effect async[hronously] set [(all [[of] the]|the)] blocks (from|within|between) %location% (to|and) %location% to %itemtype%:
 	parse:
 		continue if server.getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") is set
 	trigger:
@@ -1698,9 +1749,9 @@ object property condition (active|started):
 # Usage: if player's location is within {_pos} and {spawnPoint}
 location property condition (within|between) %location% and %location%:
 	check:
-		expr-1's x-pos is between min(expr-2's x-pos and expr-3's x-pos) and max(expr-2's x-pos and expr-3's x-pos)
-		expr-1's y-pos is between min(expr-2's y-pos and expr-3's y-pos) and max(expr-2's y-pos and expr-3's y-pos)
-		expr-1's z-pos is between min(expr-2's z-pos and expr-3's x-pos) and max(expr-2's x-pos and expr-3's x-pos)
+		expr-1's x-pos is between expr-2's x-pos and expr-3's x-pos
+		expr-1's y-pos is between expr-2's y-pos and expr-3's y-pos
+		expr-1's z-pos is between expr-2's z-pos and expr-3's x-pos
 		continue
 
 
