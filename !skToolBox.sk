@@ -45,6 +45,8 @@ import:
 	java.util.Calendar
 	java.util.regex.Pattern as RegexPattern
 	java.util.regex.Matcher
+	java.lang.management.ManagementFactory
+	java.lang.management.RuntimeMXBean
 
 	org.bukkit.Bukkit
 	org.bukkit.map.MinecraftFont	
@@ -1057,7 +1059,7 @@ expression [number of] (occurrences|repetitions) of %string% in %strings%:
 # Name: All commands
 # Description: Gets a list of all the commands on the server.
 # Usage: set {_c::*} to all commands
-expression all commands:
+plural expression all commands:
 	get: 
 		set {_c::*} to ...server.getServer().getCommandMap().getCommands()
 		loop {_c::*}:
@@ -1297,6 +1299,13 @@ string property permission:
 		set {_cmd} to server.getServer().getCommandMap().getCommand(expr-1) 
 		return if {_cmd} is not set
 		return {_cmd}.getPermission()
+
+# Name: Uptime
+# Description: Returns the uptime of th server.
+# Usage: send "The server has been online for: %uptime%"
+expression [server] uptime:
+	get:
+		return new Timespan(ManagementFactory.getRuntimeMXBean().getUptime())
 
 #         __  __          _       
 #        / _|/ _|        | |      
