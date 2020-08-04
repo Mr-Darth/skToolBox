@@ -1490,7 +1490,7 @@ effect insert [(objects|values|elements)] %objects% at [index] %integer% in %~ob
 				set {_r::%{_i}%} to {_o::%loop-index%}
 			else:
 				set {_r::%{_i}%} to loop-value
-		(raw exprs-3).change(event, {_r::*} and ChangeMode.SET)
+		set raw exprs-3 to {_r::*}
 
 # Name: Splice list
 # Description: Splices a list at a certain index.
@@ -1502,7 +1502,7 @@ effect splice %~objects% (at|by) [index] %integer%:
 			if loop-index parsed as number != expr-2:
 				set {_i} to (size of {_r::*}) + 1
 				set {_r::%{_i}%} to loop-value
-		(raw exprs-1).change(event, {_r::*} and ChangeMode.SET)
+		set raw exprs-1 to {_r::*}
 
 # Name: Force player to sleep
 # Description: Makes a player sleep at a given location as long as there is a bed
