@@ -30,7 +30,7 @@ options:
 
 
 
-	version: 1.0-BETA.5
+	version: 1.0-BETA.6
 
 import:
 
@@ -91,6 +91,8 @@ import:
 	com.sk89q.worldedit.regions.CuboidRegion
 	com.sk89q.worldedit.bukkit.BukkitAdapter
 	com.sk89q.worldedit.function.pattern.BlockPattern
+	com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats
+	com.sk89q.worldedit.bukkit.BukkitWorld
 
 #
 #       _                           _                              _               _             
@@ -1550,6 +1552,17 @@ effect async set [(all [[of] the]|the)] blocks (from|within|between) %location% 
 		set {_region} to new CuboidRegion({_pos1}, {_pos2}) 
 		set {_baseBlock} to new BlockPattern(new BaseBlock(BukkitAdapter.asBlockState(random item of expr-3)))
 		await {_editSession}.setBlocks({_region}, {_baseBlock})
+
+# Name: Paste schematic
+# Description: Paste a schematic at a give location.
+# Usage: paste schematic "plugins\FastAsyncWorldEdit\schematics\house.schem" at player with air
+# Note: Requires FastAsyncWorldEdit (FAWE)
+effect paste schematic %string% at %location% [(1¦(with|including) air)]:
+	trigger:
+		set {_schematic} to new File(expr-1)
+		set {_pos} to BlockVector3.at((x-pos of expr-2), (y-pos of expr-2), (z-pos of expr-2))
+		set {_includeAir} to true if parse mark = 1, else false
+		await ClipboardFormats.findByFile({_schematic}).load({_schematic}).paste(new BukkitWorld(world of expr-2), {_pos}, true, {_includeAir}, null)
 
 #                       _ _ _   _                 
 #                      | (_) | (_)                
