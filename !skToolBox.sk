@@ -746,7 +746,7 @@ entity property e[ntity][ ]id[entifier]:
 		return expr-1.getEntityId()
 
 # Name: Pixel width 
-# Description: Returns the pixel width f a given string.
+# Description: Returns the pixel width of a given string.
 # Usage: set {_px} to pixel width of {_input}
 string property pixel (width|size|length):
 	get:
