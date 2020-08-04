@@ -210,7 +210,7 @@ expression ((opposite|toggled) [boolean ]|not |!)%boolean%:
 # Name: All plugins
 # Description: Returns a list with the name of all the running plugins on the server.
 # Usage: send "Plugins: %plugins%"
-plural expression [all [[of] the]] [(installed|running|loaded)] plugins [on [the] server]:
+plural expression (all [[of] the]|the) [(installed|running|loaded)] plugins [on [the] server]:
 	loop of: plugin
 	get:
 		loop ...server.getServer().getPluginManager().getPlugins():
@@ -221,7 +221,7 @@ plural expression [all [[of] the]] [(installed|running|loaded)] plugins [on [the
 # Name: All Skript addons
 # Description: Returns a list with the name of all the running addons on the server.
 # Usage: send "Installed Skript Addons: %addons%"
-plural expression [all [[of] the]] [(installed|running|loaded)] [skript] addons [on [the] server]:
+plural expression (all [[of] the]|the) [(installed|running|loaded)] [skript] addons [on [the] server]:
 	loop of: addon
 	get:
 		return ...Skript.getAddons()
@@ -241,7 +241,7 @@ expression [the] dismounted(-| )entity:
 # Name: Whitelisted players
 # Description: Returns the whitelisted players of the server.
 # Usage: send "Whitelist: %whitelisted players%"
-plural expression [all [[of] the]] whitelisted players:
+plural expression (all [[of] the]|the) whitelisted players:
 	loop of: player
 	get:
 		return ...server.getServer().getWhitelistedPlayers()
@@ -410,7 +410,7 @@ plural expression:
 # Name: Formatted numbers
 # Description: Formats the given numbers using a given decimal format.
 # Usage: send "Money: %formatted player's balance%"
-expression formatted %numbers% [(from|with|using) [decimal] format %-string%]:
+expression format[ted] %numbers% [(from|with|using) [decimal] format %-string%]:
 	get:
 		loop exprs-1:
 			set {_i} to {_i} + 1
@@ -471,7 +471,7 @@ integer property ordinal [value]:
 # Name: Text from URL
 # Description: Returns the text from a URL.
 # Usage: send "Current version: %text from ""{@url}""%"
-plural expression (text|string|content[s]) (of|from) [(url|link|website)] %string%:
+plural expression (text|content[s]) (of|from) [(url|link|[web]site)] %string%:
 	get:
 		set {_br} to try new BufferedReader(try new InputStreamReader(try new URL(expr-1).openStream()))
 		set {_r::*} to ...try {_br}.lines()
@@ -556,7 +556,7 @@ expression round[ed] %numbers% (at|with|by|to) %integer% decimal[s] [place[s]]:
 # Name: Random UUID
 # Description: Returns a random UUID.
 # Usage: set {_} to random uuid
-expression (random[i(z|s)ed]|new) uuid [(1¦with[ ]out [any] (dash[es]|hyphen[s]))]:
+expression (random[i(z|s)ed]|new) uuid [(1¦without (dashes|hyphens))]:
 	get:
 		return (UUID.randomUUID().toString() if parse mark != 1, else UUID.randomUUID().toString().replace("-" and "")) 
 
@@ -609,8 +609,8 @@ expression midnight:
 # Usage: set {_i} to regex split {info} at "\d{5}"
 plural expression:
 	patterns:
-		regex split %string% (at|by|using) [[the] delimiter] %string%
-		%string% regex split (at|by|using) [[the] delimiter] %string%
+		regex split %string% (at|by|using) [[the] pattern] %string%
+		%string% regex split (at|by|using) [[the] pattern] %string%
 	get:
 		return ...try expr-1.split(expr-2)
 
@@ -678,7 +678,7 @@ integer property roman numeral:
 
 # Name: Formatted timespan
 # Description: Returns a formatted timespan.
-# Usage: send "Time played: %(time played of player) formatted ""[dd]d [hh]h [mm]m [ss]s""%"
+# Usage: send "Time played: %(time played of player) formatted ""dd days hh hours mm minutes and ss seconds""%"
 expression %timespan% (with format|formatted [as]) %string%:
 	get:
 		set {_v::seconds} to expr-1.getMilliSeconds() / 1000
@@ -804,7 +804,7 @@ entity property rotation:
 # Name: Server operators
 # Description: Returns the all of the opped players on the server.
 # Usage: loop all operators:
-plural expression [all [[of] the]] (op[ped] players|operators):
+plural expression (all [[of] the]|the) (op[ped] players|op[erator]s):
 	loop of: player
 	get:
 		return ...server.getServer().getOperators()
@@ -812,7 +812,7 @@ plural expression [all [[of] the]] (op[ped] players|operators):
 # Name: Banned players
 # Description: Returns all of the banned players on the server.
 # Usage: broadcast "%banned players%"
-plural expression [all [[of] the]] banned players:
+plural expression (all [[of] the]|the) banned players:
 	loop of: player
 	get:
 		return ...server.getServer().getBannedPlayers()
@@ -1286,6 +1286,15 @@ number property hyperbolic (1¦cos[ine]|2¦sin[e]|tan[gent]):
 expression [the] %integer%(st|nd|rd|th) (term|number) (of|from) [the] fibonacci (sequence|series):
     get:
         return round((((sqrt(5) + 1) / 2) ^ expr-1) / sqrt(5))
+
+# Name: Command permission
+# Description: Returns the permission of a command.
+# Usage: send "You don't have permission!" if player has permission (permission of command)
+string property permission:
+	get:
+		set {_cmd} to server.getServer().getCommandMap().getCommand(expr-1) 
+		return if {_cmd} is not set
+		return {_cmd}.getPermission()
 
 #         __  __          _       
 #        / _|/ _|        | |      
