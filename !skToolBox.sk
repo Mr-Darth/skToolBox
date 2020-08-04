@@ -9,7 +9,7 @@
 
 # Requirements:
 #   Skript (Tested with 2.5-alpha6)
-#   skript-reflect 2.0.0-SNAPSHOT
+#   skript-reflect 2.1.0
 #   ThatPacketAddon (Tested with 1.0-BETA.3)
 
 # Tested on Paper 1.16.1
@@ -30,7 +30,7 @@ options:
 
 
 
-	version: 1.0-BETA.6
+	version: 1.0-BETA.7
 
 import:
 
