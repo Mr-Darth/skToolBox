@@ -1462,6 +1462,28 @@ player property [total] (experience|[e]xp) [points]:
 		set expr-1's level to 0
 		set expr-1's level progress to 0
 
+# Name: Vector multiplication
+# Description: Multiplies a vector by a number.
+# Usage: set player's velocity to vector(1, 1, 1) ** {sc}
+expression:
+	return type: vector
+	patterns:
+		%vector%[ ]**[ ]%number%
+		%number%[ ]**[ ]%vector%
+	get:
+		return (expr-1.multiply(expr-2) if matched pattern = 1, else expr-2.multiply(expr-1))
+
+# Name: Vector distance
+# Description: Returns the distance between two vectors.
+# Usage: set {_dist} to distance between {_v1} and {_v2}
+expression:
+	return type: number
+	patterns:
+		distance [(1¦squared)] between %vector% and %vector%
+		[(1¦squared)] distance between %vector% and %vector%
+	get:
+		return (expr-1.distance(expr-2) if parse mark != 1, else expr-1.distanceSquared(expr-2))
+
 #         __  __          _       
 #        / _|/ _|        | |      
 #    ___| |_| |_ ___  ___| |_ ___ TM
@@ -1864,6 +1886,13 @@ location property condition (within|between) %location% and %location%:
 		expr-1's y-pos is between min((expr-2's y-pos) and (expr-3's y-pos)) and max((expr-2's y-pos) and (expr-3's y-pos))
 		expr-1's z-pos is between min((expr-2's z-pos) and (expr-3's z-pos)) and max((expr-2's z-pos) and (expr-3's z-pos))
 		continue
+
+# Name: Vector is normalized
+# Description: Checks if a vector is normalized.
+# Usage: broadcast "yeeee" if {_vector} is normalized
+vector property condition normalized:
+	check:
+		continue if expr-1.isNormalized() = true
 
 
 
