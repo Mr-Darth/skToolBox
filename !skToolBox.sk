@@ -1721,6 +1721,8 @@ effect async[hronously] set [(all [[of] the]|the)] blocks (from|within|between) 
 # Usage: paste schematic "plugins\FastAsyncWorldEdit\schematics\house.schem" at player with air
 # Note: Requires FastAsyncWorldEdit (FAWE)
 effect paste schematic %string% at %location% [(1¦(with|including) air)]:
+	parse:
+		continue if server.getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") is set
 	trigger:
 		set {_schematic} to new File(expr-1)
 		set {_pos} to BlockVector3.at((x-pos of expr-2), (y-pos of expr-2), (z-pos of expr-2))
@@ -1852,9 +1854,9 @@ object property condition (active|started):
 # Usage: if player's location is within {_pos} and {spawnPoint}
 location property condition (within|between) %location% and %location%:
 	check:
-		expr-1's x-pos is between expr-2's x-pos and expr-3's x-pos
-		expr-1's y-pos is between expr-2's y-pos and expr-3's y-pos
-		expr-1's z-pos is between expr-2's z-pos and expr-3's x-pos
+		expr-1's x-pos is between min((expr-2's x-pos) and (expr-3's x-pos)) and max((expr-2's x-pos) and (expr-3's x-pos))
+		expr-1's y-pos is between min((expr-2's y-pos) and (expr-3's y-pos)) and max((expr-2's y-pos) and (expr-3's y-pos))
+		expr-1's z-pos is between min((expr-2's z-pos) and (expr-3's z-pos)) and max((expr-2's z-pos) and (expr-3's z-pos))
 		continue
 
 
