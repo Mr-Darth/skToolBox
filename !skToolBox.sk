@@ -364,7 +364,13 @@ plural livingentity property [(all [[of] the]|the)] [active] potion[s] [effect[s
 		loop ...expr-1.getActivePotionEffects():
 			set {_r::%loop-value.getType()%} to loop-value.getType()
 		return {_r::*}
+	remove potion effect type:
+		set {_e} to expr-1
+		remove change value from {_e}
 	delete:
+		set {_e} to expr-1
+		remove (all active potion effects of expr-1) from {_e}
+	reset:
 		set {_e} to expr-1
 		remove (all active potion effects of expr-1) from {_e}
 
