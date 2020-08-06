@@ -313,8 +313,8 @@ expression:
 		[the] [value of] (1¦pi|2¦e[uler['s] number]|3¦(phi|[the] golden ratio))
 		(1¦pi|2¦e[uler['s] number]|3¦(phi|[the] golden ratio))['s value]
 	get:
-		return Math.PI if parse mark = 1
-		return Math.E if parse mark = 2
+		return 3.141592653589793 if parse mark = 1
+		return 2.718281828459045 if parse mark = 2
 		return (sqrt(5) + 1) / 2 if parse mark = 3
 
 # Name: Degrees to radians
@@ -323,7 +323,7 @@ expression:
 expression %number% [degree[s]] to rad[ians]:
 	return type: number
 	get:
-		return Math.toRadians(expr-1)
+		return (expr-1 * 3.141592653589793) / 180
 
 # Name: Radians to degrees
 # Description: Converts radians to degrees.
@@ -331,7 +331,7 @@ expression %number% [degree[s]] to rad[ians]:
 expression %number% [rad[ians]] to degree[s]:
 	return type: number
 	get:
-		return Math.toDegrees(expr-1)
+		return (expr-1 * 180) / 3.141592653589793
 
 # Name: Midpoint
 # Description: Gets the midpoint of multiple locations.
@@ -380,7 +380,7 @@ livingentity property duration of %potion effect type%:
 # Description: Returns the amplifier of a potion effect.
 # Usage: send "You have speed of tier %tier of speed of player%"
 livingentity property (tier|amplifier) of %potion effect type%:
-	return type: number
+	return type: integer
 	get:
 		return expr-1.getPotionEffect(expr-2).getAmplifier()
 
@@ -388,15 +388,15 @@ livingentity property (tier|amplifier) of %potion effect type%:
 # Description: Get or change the age of an entity.
 # Usage: set age of last spawned sheep to -10000
 livingentity property age:
-	return type: number
+	return type: integer
 	get:
 		return try expr-1.getAge()
 	set number:
-		try expr-1.setAge(change value)
+		try expr-1.setAge((change value).intValue())
 	add number:
-		try expr-1.setAge((try expr-1.getAge()) + (change value))
+		try expr-1.setAge((try expr-1.getAge()) + (change value).intValue())
 	remove number:
-		try expr-1.setAge((try expr-1.getAge()) - (change value))
+		try expr-1.setAge((try expr-1.getAge()) - (change value).intValue())
 
 # Name: Split string every x characters
 # Description: Splits a string by every x characters.
@@ -455,7 +455,7 @@ expression rainbow %string% [every %-int% char[acter]s] [[colo[u]red] [(with|by|
 # Usage: set border of player's inventory to diamond
 # Credits: blue
 plural inventory property border [slots]:
-	return type: numbers
+	return type: integers
 	get:
 		set {_r::*} to (integers between 0 and 8) and (integers between ((rows of expr-1) * 9) - 9 and ((rows of expr-1) * 9) - 1) if (rows of expr-1) > 2
 		loop integers from 1 to (rows of expr-1):
@@ -640,7 +640,7 @@ plural expression:
 # Usage: kick player due to "Nope..." if protocol version of player <= 578
 # Note: Requires ProtocolLib
 player property protocol version:
-	return type: number
+	return type: integer
 	get:
 		return expr-1.getProtocolVersion()
 
@@ -735,7 +735,7 @@ expression compact[ed] %number%:
 # Description: Returns the factorial of an integer.
 # Usage: set {_combinations} to factorial {elements}
 expression:
-	return type: number
+	return type: integer
 	patterns:
 		factorial [of] %integer%
 		%integer%(!| factorial)
@@ -763,7 +763,7 @@ string property [english] plural:
 # Description: Returns the entity id of an entity.
 # Usage: set int field 0 of {_packet} to entity id of {_t}
 entity property e[ntity][ ]id[entifier]:
-	return type: number
+	return type: integer
 	get:
 		return expr-1.getEntityId()
 
@@ -771,7 +771,7 @@ entity property e[ntity][ ]id[entifier]:
 # Description: Returns the pixel width of a given string.
 # Usage: set {_px} to pixel width of {_input}
 string property pixel (width|size|length):
-	return type: number
+	return type: integer
 	get:
 		return new MinecraftFont().getWidth(expr-1)
 
@@ -863,7 +863,7 @@ plural expression [(all [[of] the]|the)] banned players:
 # Description: Returns the maximum age of a block.
 # Usage: set {_tG} to maximum age of {_b}
 block property max[imum] age:
-	return type: number
+	return type: integer
 	get:
 		return if try expr-1.getBlockData() is not instance of BlockDataAgeable
 		return expr-1.getBlockData().getMaximumAge()
@@ -1072,24 +1072,24 @@ entity property (art|picture|image):
 # Description: Get or change the water level of a cauldron.
 # Usage: set player's targeted block's stored water level to 3
 block property [(contained|deposited|stored)] (water|fluid|liquid) level:
-	return type: number
+	return type: integer
 	get:
 		return if try expr-1.getBlockData() is not instance of Levelled
 		return expr-1.getBlockData().getLevel() 
 	set number:
 		try expr-1.getBlockData() is instance of Levelled
 		set {_b} to expr-1.getBlockData()
-		{_b}.setLevel(change value)
+		{_b}.setLevel((change value).intValue())
 		expr-1.setBlockData({_b})
 	add number:
 		try expr-1.getBlockData() is instance of Levelled
 		set {_b} to expr-1.getBlockData()
-		try {_b}.setLevel(expr-1.getBlockData().getLevel() + (change value))
+		try {_b}.setLevel(expr-1.getBlockData().getLevel() + (change value).intValue())
 		expr-1.setBlockData({_b})
 	remove number:
 		try expr-1.getBlockData() is instance of Levelled
 		set {_b} to expr-1.getBlockData()
-		try {_b}.setLevel((expr-1.getBlockData().getLevel()) - (change value))
+		try {_b}.setLevel((expr-1.getBlockData().getLevel()) - (change value).intValue())
 		expr-1.setBlockData({_b})
 	reset:
 		try expr-1.getBlockData() is instance of Levelled
@@ -1101,7 +1101,7 @@ block property [(contained|deposited|stored)] (water|fluid|liquid) level:
 # Description: Returns the number of occurrences of a string in a string.
 # Usage: set {_i} to number of occurrences of "E" in {list::*}
 expression [the] [number of] (occurrences|repetitions) of %string% in %strings%:
-	return type: number
+	return type: integer
 	get:
 		loop exprs-2:
 			add ((size of split "%loop-expression%" at expr-1) - 1) to {_r}
@@ -1122,7 +1122,7 @@ plural expression all [[of] the] commands:
 # Description: Returns the amount of slots an inventory has.
 # Usage: set slot (inv size of player's inventory) to dirt named "The End!"
 inventory property inv[entory] size:
-	return type: number
+	return type: integer
 	get:
 		return expr-1.getSize()
 
@@ -1251,7 +1251,7 @@ object property active time:
 # Description: Gets the bad omen level of a raid.
 # Usage: broadcast "Ooop" if bad omen level of {_raid} > 2
 object property bad omen level:
-	return type: number
+	return type: integer
 	get:
 		return if expr-1 is not instance of Raid
 		return expr-1.getBadOmenLevel()
@@ -1301,7 +1301,7 @@ object property [raid] status:
 # Description: Returns the total or current amount of spawned raiding groups.
 # Usage: set {_total} to total groups of {_raid}
 object property (total|1¦spawned) [raiding] groups:
-	return type: number
+	return type: integer
 	get:
 		return if expr-1 is not instance of Raid
 		return (expr-1.getTotalGroups() if parse mark != 1, else expr-1.getSpawnedGroups())
@@ -1319,7 +1319,7 @@ object property [total] health:
 # Description: Returns the amount of waves of a raid.
 # Usage: set {_am} to total wave count of {_raid}
 object property [total] wave(s| count):
-	return type: number
+	return type: integer
 	get:
 		return if expr-1 is not instance of Raid
 		return expr-1.getTotalWaves()
@@ -1365,7 +1365,7 @@ number property hyperbolic (1¦cos[ine]|2¦sin[e]|tan[gent]):
 # Description: Returns the Nth number of the Fibonacci sequence.
 # Usage: set {_newPrice} to (player's level)th number of the fibonacci sequence
 expression [the] %integer%(st|nd|rd|th) (term|number) (of|from) [the] fibonacci (sequence|series):
-	return type: number
+	return type: integer
 	get:
 		return round((((sqrt(5) + 1) / 2) ^ expr-1) / sqrt(5))
 
@@ -1431,6 +1431,30 @@ plural itemtype property [(craft[ing]|recipe)] ingredients:
 		return ...{_recipe}.getIngredientMap().values() if {_recipe} is instance of ShapedRecipe
 		return ...{_recipe}.getIngredients() if {_recipe} is instance of MerchantRecipe
 		return {_recipe}.getInput() if {_recipe} is instance of CookingRecipe or StonecuttingRecipe
+
+# Name: Total experience
+# Description: Get or change the total experience of a player.
+# Usage: add 16 to xp of player
+player property [total] (experience|[e]xp) [points]:
+	return type: integer
+	get:
+		set {_level} to expr-1's level
+		return calcExperience({_level})
+	set number:
+		set expr-1's level to 0
+		set expr-1's level progress to 0
+		expr-1.giveExp((change value).intValue())
+	add number:
+		expr-1.giveExp((change value).intValue())
+	remove number:
+		set {_xp} to calcExperience((expr-1's level).longValue())
+		set {_setTo} to {_xp} - (change value).intValue()	
+		set expr-1's level to 0
+		set expr-1's level progress to 0
+		expr-1.giveExp({_setTo})
+	reset:
+		set expr-1's level to 0
+		set expr-1's level progress to 0
 
 #         __  __          _       
 #        / _|/ _|        | |      
