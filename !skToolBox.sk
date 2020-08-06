@@ -344,7 +344,7 @@ expression [the] (midpoint|center) (of|from) %locations%:
 			set {_l} to loop-expression
 			set {_v} to (vector from {_l})
 			set {_midpoint} to vector ((x of {_midpoint}) + ((x of {_v}) * {_f})), ((y of {_midpoint}) + ((y of {_v}) * {_f})), ((z of {_midpoint}) + ((z of {_v}) * {_f}))
-		return location at (x of {_midpoint}), (y of {_midpoint}), (z of {_midpoint}) in (first element out of exprs-1)'s world
+		return (location at 0, 0, 0 in (first element of exprs-1)'s world) ~ {_midpoint}
 
 # Name: Average value
 # Description: Returns the average value of a list of numbers.
