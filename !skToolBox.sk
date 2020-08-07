@@ -1474,16 +1474,24 @@ expression:
 # Name: Current path
 # Description: Returns the current path of an entity.
 # Usage: set {path} to current path of event-entity
+# Note: Requires Paper
 livingentity property [current] path:
 	return type: object
+	parse:
+		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
+		Skript.error("The 'current path' expression is not supported on this server software")
 	get:
 		return try expr-1.getPathfinder().getCurrentPath()
 
 # Name: Final/next point of path
 # Description: Returns the final or next point of a path.
 # Usage: teleport {_spectators::*} to next point of {_path}
+# Note: Requires Paper
 object property (final|1¦next) [path[finding]] point:
 	return type: location
+	parse:
+		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
+		Skript.error("The 'final/next point' expression is not supported on this server software")
 	get:
 		return if expr-1 is not instance of PathResult
 		return (expr-1.getNextPoint() if parse mark = 1, else expr-1.getFinalPoint())
@@ -1491,8 +1499,12 @@ object property (final|1¦next) [path[finding]] point:
 # Name: All points of path
 # Description: Returns a list of all the points of a path.
 # Usage: set {_p::*} to points of {_path}
+# Note: Requires Paper
 plural object property [(all [[of] the]|the)] [path[finding]] points:
 	return type: locations
+	parse:
+		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
+		Skript.error("The 'all points' expression is not supported on this server software")
 	get:
 		return if expr-1 is not instance of PathResult
 		return ...expr-1.getPoints()
