@@ -71,6 +71,7 @@ import:
 	org.bukkit.inventory.StonecuttingRecipe
 	org.bukkit.inventory.meta.Repairable
 
+	com.destroystokyo.paper.entity.Pathfinder$PathResult
 
 	ch.njol.skript.Skript
 	ch.njol.skript.util.Timespan
@@ -1107,7 +1108,7 @@ expression [the] [number of] (occurrences|repetitions) of %string% in %strings%:
 # Name: All commands
 # Description: Gets a list of all the commands on the server.
 # Usage: set {_c::*} to all commands
-plural expression all [[of] the] commands:
+plural expression [(all [[of] the]|the)] commands:
 	return type: strings
 	get: 
 		loop ...server.getServer().getCommandMap().getCommands():
@@ -1331,7 +1332,7 @@ entity property origin:
 # Name: Common elements
 # Description: Returns a list with the common objects of two lists.
 # Usage: remove common elements of {t::*} and {j::*} from {d::*}
-plural expression [the] common (objects|elements|values) of %objects% and %objects%:
+plural expression [(all [[of] the]|the)] common (objects|elements|values) of %objects% and %objects%:
 	return type: objects
 	get:
 		return exprs-1 where [exprs-2 contains input]
@@ -1469,6 +1470,32 @@ expression:
 		[(1¦squared)] distance between %vector% and %vector%
 	get:
 		return (expr-1.distance(expr-2) if parse mark != 1, else expr-1.distanceSquared(expr-2))
+
+# Name: Current path
+# Description: Returns the current path of an entity.
+# Usage: set {path} to current path of event-entity
+livingentity property [current] path:
+	return type: object
+	get:
+		return try expr-1.getPathfinder().getCurrentPath()
+
+# Name: Final/next point of path
+# Description: Returns the final or next point of a path.
+# Usage: teleport {_spectators::*} to next point of {_path}
+object property (final|1¦next) [path[finding]] point:
+	return type: location
+	get:
+		return if expr-1 is not instance of PathResult
+		return (expr-1.getNextPoint() if parse mark = 1, else expr-1.getFinalPoint())
+
+# Name: All points of path
+# Description: Returns a list of all the points of a path.
+# Usage: set {_p::*} to points of {_path}
+plural object property [(all [[of] the]|the)] [path[finding]] points:
+	return type: locations
+	get:
+		return if expr-1 is not instance of PathResult
+		return ...expr-1.getPoints()
 
 #         __  __          _       
 #        / _|/ _|        | |      
