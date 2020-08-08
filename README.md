@@ -2,7 +2,7 @@
 A Skript API based on skript-reflect that adds tons of new features to use!
 
 ## Requirements
-* [Skript](https://github.com/SkriptLang/Skript/releases) - tested with 2.5-alpha6(rev1)
+* [Skript](https://github.com/SkriptLang/Skript/releases) - tested with 2.5-beta1
 * [skript-reflect](https://github.com/TPGamesNL/skript-reflect/actions) - tested with 2.1.0
 * [ThatPacketAddon](https://skripttools.net/dl/ThatPacketAddon+1.0-BETA.3.jar) - tested with 1.0-BETA.3
 
