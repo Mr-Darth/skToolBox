@@ -1512,10 +1512,24 @@ plural expression [a] [loc[ation]] line (between|from|within) %location% (to|and
 			set {_r::%loop-number%} to (location at 0, 0, 0 in expr-1's world) ~ ((vector from expr-1 to expr-2).multiply(1 / {_points}).clone().multiply(loop-number) ++ {_vector1})
 		return {_r::*}
 
+# Name: Circle
+# Description: Returns the points of a circle from the center, radius and density. 
+#              The density controls the distance between each point.
+# Usage: show happy villaget at a circle at player with radius 7, density 3
+plural expression [loc[ation][s] of] [a] circle at %location% with [a] radius [of] %number%(,| and) [a] density [of] %number%:
+	return type: locations
+	get:
+		set {_points} to (expr-2 * expr-3 * 3.141592653589793)
+		set {_angle} to 360 / {_points}
+		loop {_points} times:
+			set {_r::%loop-number%} to expr-1  ~ (new cylindrical vector from radius expr-2, yaw (loop-number * {_angle}), height 0)
+		return {_r::*}
+
 # Name: Pickup delay
 # Description: Get or change the delay before an item will be available to be picked up by players.
 # Usage: set pickup delay of {_itemEntity} to 5 seconds
 entity property pick[ ]up (time|delay):
+	return type: timespan
 	get:
 		return if expr-1 is not a dropped item
 		return new Timespan(expr-1.getPickupDelay() * 50)
