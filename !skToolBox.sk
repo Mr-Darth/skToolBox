@@ -317,7 +317,7 @@ expression:
 # Name: Degrees to radians
 # Description: Converts degrees to radians.
 # Usage: set {_rad} to 180 degrees to radians
-expression %number% [degree[s]] to rad[ians]:
+expression %number% [degrees] (in|to|as) rad[ians]:
 	return type: number
 	get:
 		return (expr-1 * 3.141592653589793) / 180
@@ -325,7 +325,7 @@ expression %number% [degree[s]] to rad[ians]:
 # Name: Radians to degrees
 # Description: Converts radians to degrees.
 # Usage: set {_dg} to 3.14 radians to degrees
-expression %number% [rad[ians]] to degree[s]:
+expression %number% [rad[ians]] (in|to|as) degrees:
 	return type: number
 	get:
 		return (expr-1 * 180) / 3.141592653589793
@@ -1449,17 +1449,6 @@ player property [total] (experience|[e]xp) [points]:
 		set expr-1's level to 0
 		set expr-1's level progress to 0
 
-# Name: Vector multiplication
-# Description: Multiplies a vector by a number.
-# Usage: set player's velocity to vector(1, 1, 1) ** {sc}
-expression:
-	return type: vector
-	patterns:
-		%vector%[ ]**[ ]%number%
-		%number%[ ]**[ ]%vector%
-	get:
-		return (expr-1.multiply(expr-2) if matched pattern = 1, else expr-2.multiply(expr-1))
-
 # Name: Vector distance
 # Description: Returns the distance between two vectors.
 # Usage: set {_dist} to distance between {_v1} and {_v2}
@@ -1508,6 +1497,31 @@ plural object property [(all [[of] the]|the)] [path[finding]] points:
 	get:
 		return if expr-1 is not instance of PathResult
 		return ...expr-1.getPoints()
+
+# Name: Location line
+# Description: Gets a line of locations between two points. The density controls the
+#              distance between each point.
+# Usage: show flame at line from {p1} to {p2} with density 10
+plural expression [a] [loc[ation]] line (between|from|within) %location% (to|and) %location% (with|of|using) [a] density [of] %number%:
+	return type: locations
+	get:
+		set {_vector1} to vector from expr-1
+		set {_vector2} to vector from expr-2
+		set {_points} to ({_vector1}.distance({_vector2}) * expr-3) + 1
+		loop {_points} times:
+			set {_r::%loop-number%} to (location at 0, 0, 0 in expr-1's world) ~ ((vector from expr-1 to expr-2).multiply(1 / {_points}).clone().multiply(loop-number) ++ {_vector1})
+		return {_r::*}
+
+# Name: Pickup delay
+# Description: Get or change the delay before an item will be available to be picked up by players.
+# Usage: set pickup delay of {_itemEntity} to 5 seconds
+entity property pick[ ]up (time|delay):
+	get:
+		return if expr-1 is not a dropped item
+		return new Timespan(expr-1.getPickupDelay() * 50)
+	set timespan:
+		expr-1 is a dropped item
+		expr-1.setPickupDelay((change value).getTicks_i())
 
 #         __  __          _       
 #        / _|/ _|        | |      
