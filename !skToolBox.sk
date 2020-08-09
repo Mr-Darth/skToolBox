@@ -1515,7 +1515,7 @@ plural expression [a] [loc[ation]] line (between|from|within) %location% (to|and
 # Name: Circle
 # Description: Returns the points of a circle from the center, radius and density. 
 #              The density controls the distance between each point.
-# Usage: show happy villaget at a circle at player with radius 7, density 3
+# Usage: show happy villager at a circle at player with radius 7, density 3
 plural expression [loc[ation][s] of] [a] circle at %location% with [a] radius [of] %number%(,| and) [a] density [of] %number%:
 	return type: locations
 	get:
