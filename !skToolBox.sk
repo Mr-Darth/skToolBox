@@ -32,6 +32,10 @@ options:
 
 	version: 1.0-BETA.8
 
+option nms:
+	get:
+		return 4th element of split "%class of server.getServer()%" by "."
+
 import:
 
 	java.lang.Math
@@ -103,6 +107,8 @@ import:
 	com.sk89q.worldedit.function.pattern.BlockPattern
 	com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats
 	com.sk89q.worldedit.bukkit.BukkitWorld
+
+	org.bukkit.craftbukkit.{@nms}.entity.CraftEntity
 
 #
 #       _                           _                              _               _             
@@ -1502,7 +1508,7 @@ plural object property [(all [[of] the]|the)] [path[finding]] points:
 # Description: Gets a line of locations between two points. The density controls the
 #              distance between each point.
 # Usage: show flame at line from {p1} to {p2} with density 10
-plural expression [(loc[ation]s|points) of] [a] line (between|from|within) %location% (to|and) %location% (with|of|using) [a] density [of] %number%:
+plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] line (between|from|within) %location% (to|and) %location% (with|of|using) [a] density [of] %number%:
 	return type: locations
 	get:
 		set {_vector1} to vector from expr-1
@@ -1516,20 +1522,20 @@ plural expression [(loc[ation]s|points) of] [a] line (between|from|within) %loca
 # Description: Returns the points of a circle from the center, radius and density. 
 #              The density controls the distance between each point.
 # Usage: show happy villager at a circle at player with radius 7, density 3
-plural expression [(loc[ation]s|points) of] [a] circle at %location% (with|of) [a] radius [of] %number%(,| and) [a] density [of] %number%:
+plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] circle at %location% (with|of) [a] radius [of] %number%(,| and) [a] density [of] %number%:
 	return type: locations
 	get:
 		set {_points} to (expr-2 * expr-3 * 3.141592653589793)
 		set {_angle} to 360 / {_points}
 		loop {_points} times:
-			set {_r::%loop-number%} to expr-1  ~ (new cylindrical vector from radius expr-2, yaw (loop-number * {_angle}), height 0)
+			set {_r::%loop-number%} to expr-1  ~ (new cylindrical vector from expr-2, (loop-number * {_angle}), 0)
 		return {_r::*}
 
 # Name: Sphere
 # Description: Returns the points of a sphere from its center, radius and density.
 #              The density controls the distance between each point.
 # Usage: show smoke at points of a sphere at player with a radius of 10 and a density of 1
-plural expression [(loc[ation]s|points) of] [a] sphere at %location% (with|of) [a] radius [of] %number%(,| and) [a] density [of] %number%:
+plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] sphere at %location% (with|of) [a] radius [of] %number%(,| and) [a] density [of] %number%:
 	return type: locations
 	get:
 		set {_points} to (expr-2 * expr-3 * 3.141592653589793)
@@ -1555,6 +1561,14 @@ entity property pick[ ]up (time|delay):
 	set timespan:
 		expr-1 is a dropped item
 		expr-1.setPickupDelay((change value).getTicks_i())
+
+# Name: Root vehicle
+# Description: Returns the root vehicle of an entity.
+# Usage: kill root vehicle of player
+entity property root vehicle:
+	return type: entity
+	get:
+		return CraftEntity.getEntity(server.getServer(), expr-1.getHandle().getRootVehicle())
 
 #         __  __          _       
 #        / _|/ _|        | |      
