@@ -1502,7 +1502,7 @@ plural object property [(all [[of] the]|the)] [path[finding]] points:
 # Description: Gets a line of locations between two points. The density controls the
 #              distance between each point.
 # Usage: show flame at line from {p1} to {p2} with density 10
-plural expression [a] [loc[ation]] line (between|from|within) %location% (to|and) %location% (with|of|using) [a] density [of] %number%:
+plural expression [(loc[ation]s|points) of] [a] line (between|from|within) %location% (to|and) %location% (with|of|using) [a] density [of] %number%:
 	return type: locations
 	get:
 		set {_vector1} to vector from expr-1
@@ -1516,13 +1516,32 @@ plural expression [a] [loc[ation]] line (between|from|within) %location% (to|and
 # Description: Returns the points of a circle from the center, radius and density. 
 #              The density controls the distance between each point.
 # Usage: show happy villager at a circle at player with radius 7, density 3
-plural expression [loc[ation][s] of] [a] circle at %location% with [a] radius [of] %number%(,| and) [a] density [of] %number%:
+plural expression [(loc[ation]s|points) of] [a] circle at %location% (with|of) [a] radius [of] %number%(,| and) [a] density [of] %number%:
 	return type: locations
 	get:
 		set {_points} to (expr-2 * expr-3 * 3.141592653589793)
 		set {_angle} to 360 / {_points}
 		loop {_points} times:
 			set {_r::%loop-number%} to expr-1  ~ (new cylindrical vector from radius expr-2, yaw (loop-number * {_angle}), height 0)
+		return {_r::*}
+
+# Name: Sphere
+# Description: Returns the points of a sphere from its center, radius and density.
+#              The density controls the distance between each point.
+# Usage: show smoke at points of a sphere at player with a radius of 10 and a density of 1
+plural expression [(loc[ation]s|points) of] [a] sphere at %location% (with|of) [a] radius [of] %number%(,| and) [a] density [of] %number%:
+	return type: locations
+	get:
+		set {_points} to (expr-2 * expr-3 * 3.141592653589793)
+		set {_dy} to 360 / {_points}
+		set {_dp} to 360 / {_points}
+		loop ({_points} ^ 2) times:
+			set {_s} to loop-number
+			set {_r::%{_s}%} to expr-1 ~ (new spherical vector expr-2, {_y}, {_p})
+			add {_dp} to {_p}
+			floor(mod(loop-number, {_points})) = 0
+			add {_dy} to {_y}
+			set {_p} to 0
 		return {_r::*}
 
 # Name: Pickup delay
