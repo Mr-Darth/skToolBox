@@ -1550,6 +1550,20 @@ plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] sphere at
 			set {_p} to 0
 		return {_r::*}
 
+# Name: Helix
+# Description: Returns the points of a helix from a location, radius, step, height and density.
+#              The density controls the distance between each point.
+# Usage: show green spark at helix at player with radius 3, height 10, step 3, density 5
+plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] helix at %location% (of|with) [a] radius [of] %number%(,| and) [a] height [of] %number%(,| and) [a] [height] (step|increase) [of] %number%(,| and) [a] density [of] %number%:
+	return type: locations
+	get:
+		set {_points} to (expr-2 * expr-3 * expr-5 * 2 * 3.141592653589793)
+		set {_da} to (360 * expr-3 / (expr-4 * {_points}))
+		set {_dh} to expr-3 / {_points}
+		loop {_points} times:
+			set {_r::%loop-number%} to expr-1 ~ (cylindrical vector with expr-2, ({_da} * loop-number), ({_dh} * loop-number))
+		return {_r::*}
+
 # Name: Pickup delay
 # Description: Get or change the delay before an item will be available to be picked up by players.
 # Usage: set pickup delay of {_itemEntity} to 5 seconds
