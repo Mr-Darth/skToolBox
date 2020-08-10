@@ -1522,7 +1522,7 @@ plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] line (bet
 # Description: Returns the points of a circle from the center, radius and density. 
 #              The density controls the distance between each point.
 # Usage: show happy villager at a circle at player with radius 7, density 3
-plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] circle at %location% (with|of) [a] radius [of] %number%(,| and) [a] density [of] %number%:
+plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] circle (at|from) %location% (with|of) [a] radius [of] %number%(,| and) [with] [a] density [of] %number%:
 	return type: locations
 	get:
 		set {_points} to (expr-2 * expr-3 * 3.141592653589793)
@@ -1535,7 +1535,7 @@ plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] circle at
 # Description: Returns the points of a sphere from its center, radius and density.
 #              The density controls the distance between each point.
 # Usage: show smoke at points of a sphere at player with a radius of 10 and a density of 1
-plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] sphere at %location% (with|of) [a] radius [of] %number%(,| and) [a] density [of] %number%:
+plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] sphere (at|from) %location% (with|of) [a] radius [of] %number%(,| and) [with] [a] density [of] %number%:
 	return type: locations
 	get:
 		set {_points} to (expr-2 * expr-3 * 3.141592653589793)
@@ -1553,8 +1553,9 @@ plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] sphere at
 # Name: Helix
 # Description: Returns the points of a helix from a location, radius, step, height and density.
 #              The density controls the distance between each point.
+#              A negative slope will reverse the rotation of the helix.
 # Usage: show green spark at helix at player with radius 3, height 10, step 3, density 5
-plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] helix at %location% (of|with) [a] radius [of] %number%(,| and) [a] height [of] %number%(,| and) [a] [height] (step|increase) [of] %number%(,| and) [a] density [of] %number%:
+plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] helix (at|from) %location% (of|with) [a] radius [of] %number%(,| and) [with] [a] height [of] %number%(,| and) [with] [a] [height] (step|increase|slope) [of] %number%(,| and) [with] [a] density [of] %number%:
 	return type: locations
 	get:
 		set {_points} to (expr-2 * expr-3 * expr-5 * 2 * 3.141592653589793)
