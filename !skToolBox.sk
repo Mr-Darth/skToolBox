@@ -68,6 +68,7 @@ import:
 	org.bukkit.event.player.PlayerFishEvent$State as FishingState
 	org.bukkit.event.player.PlayerLoginEvent$Result as LoginResult
 	org.bukkit.Raid$RaidStatus
+	org.bukkit.block.PistonMoveReaction as PistonReactions
 	org.bukkit.inventory.ShapelessRecipe
 	org.bukkit.inventory.ShapedRecipe
 	org.bukkit.inventory.CookingRecipe
@@ -154,31 +155,37 @@ on load:
 
 # Name: Fishing states
 expression [[fishing] state] (0¦fishing|1¦caught fish|2¦caught entity|3¦in ground|4¦failed attempt|5¦reel in|6¦bite):
+	return type: object
 	get:
 		return FishingState.values()[parse mark]
 
 # Name: Horse colors
 expression [horse color] (0¦white|1¦creamy|2¦chestnut|3¦brown|4¦black|5¦gray|6¦dark brown):
+	return type: object
 	get:
 		return HorseColor.values()[parse mark]
 
 # Name: Horse styles
 expression [horse style] (0¦none|1¦white|2¦white field|3¦white dots|4¦black dots):
+	return type: object
 	get:
 		return HorseStyle.values()[parse mark]
 
 # Name: Login results
 expression [[(connect|login)] result] (0¦allow[ed]|1¦[(kick|server)] full|2¦[kick] ban[ned]|3¦[kick] whitelist|4¦[kick] other):
+	return type: object
 	get:
 		return LoginResult.values()[parse mark]
 
 # Name: Rotations
 expression [rotation] (0¦none|1¦clockwise 45|2¦clockwise|3¦counter clockwise 135|4¦flipped|5¦flipped 45|6¦counter clockwise|7¦counter clockwise 45):
+	return type: object
 	get:
 		return Rotation.values()[parse mark] 
 
 # Name: Painting arts
 expression:
+	return type: object
 	patterns: 
 		[[painting] art] (0¦kebab|1¦aztec|2¦alban|3¦aztec[ ]2|4¦bomb|5¦plant|6¦wasteland|7¦pool|8¦courbet|9¦sea|10¦sunset|11¦creebet|12¦wanderer|13¦graham|14¦match|15¦bust|16|stage|17¦void|18¦skull and roses|19¦wither|20¦fighters|21¦pointer|22¦pigscene|23¦burning skull|24¦skeleton|25¦donkey kong)
 	get:
@@ -186,14 +193,21 @@ expression:
 
 # Name: Item flags
 expression [[item] flag[s]] (hide|hidden) (0¦enchant[ment]s|1¦attributes|2¦unbreakable|3¦destroys|4¦placed on|5¦potion[ effect]s):
+	return type: object
 	get:
 		return ItemFlag.values()[parse mark]
 
 # Name: Raid statuses
 expression [raid status] (0¦ongoing|1¦victory|2¦loss|3¦stopped):
+	return type: object
 	get:
 		return RaidStatus.values()[parse mark]
 
+# Name: Piston reactions
+expression [piston [mov(e|ing)] reaction] (0¦move|1¦(destroy|break)|2¦(block|resist)|3¦ignore[d]|4¦push only):
+	return type: object
+	get:
+		return PistonReactions.values()[parse mark]
 
 #                                                             
 #                                    (_)                
@@ -1620,6 +1634,14 @@ entity property root vehicle:
 	return type: entity
 	get:
 		return CraftEntity.getEntity(server.getServer(), expr-1.getHandle().getRootVehicle())
+
+# Name: Piston reaction
+# Description: Returns the reaction of the block when moved by a piston.
+# Usage: broadcast "%piston reaction of event-block%"
+block property piston [mov(e|ing)] reaction:
+	return type: object
+	get:
+		return PistonReactions.values()[PistonReactions.ordinal(expr-1.getPistonMoveReaction())]
 
 #         __  __          _       
 #        / _|/ _|        | |      
