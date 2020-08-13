@@ -8,7 +8,7 @@
 #
 
 # Requirements:
-#   Skript (Tested with 2.5-alpha6)
+#   Skript (Tested with 2.5-beta1)
 #   skript-reflect 2.1.0
 #   ThatPacketAddon (Tested with 1.0-BETA.3)
 
@@ -1514,8 +1514,9 @@ plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] line (bet
 		set {_vector1} to vector from expr-1
 		set {_vector2} to vector from expr-2
 		set {_points} to ({_vector1}.distance({_vector2}) * expr-3) + 1
+		set {_d} to (vector from expr-1 to expr-2).multiply(1 / {_points})
 		loop {_points} times:
-			set {_r::%loop-number%} to (location at 0, 0, 0 in expr-1's world) ~ ((vector from expr-1 to expr-2).multiply(1 / {_points}).clone().multiply(loop-number) ++ {_vector1})
+			set {_r::%loop-number%} to (location at 0, 0, 0 in expr-1's world) ~ ({_d}.clone().multiply(loop-number) ++ {_vector1})
 		return {_r::*}
 
 # Name: Circle
@@ -1563,6 +1564,29 @@ plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] helix (at
 		set {_dh} to expr-3 / {_points}
 		loop {_points} times:
 			set {_r::%loop-number%} to expr-1 ~ (cylindrical vector with expr-2, ({_da} * loop-number), ({_dh} * loop-number))
+		return {_r::*}
+
+# Name: Linked locations
+# Description: Returns a list of points that link multiple locations with lines.
+#              The density controls the distance between each point.
+# Usage: show flame at {_points::*} linked using a density of 10
+plural expression:
+	return type: locations
+	patterns:
+		%locations% (linked|connected) (with|using) [a] density [of] %number%
+		(link|connect)[ed] %locations% (with|using) [a] density [of] %number%
+	get:
+		loop exprs-1:
+			add 1 to {_i}
+			set {_l} to loop-expression
+			set {_v::%{_i}%} to vector from {_l}
+		loop {_v::*}:
+			loop {_v::*}:
+				set {_points} to (loop-value-1.distance(loop-value-2) * expr-2) + 1
+				set {_d} to (loop-value-2 -- loop-value-1).multiply(1 / {_points})
+				loop {_points} times:
+					set {_o} to (location at 0, 0, 0 in (first element of exprs-1)'s world) ~ ({_d}.clone().multiply(loop-number) ++ loop-value-1)
+					set {_r::%{_o}%} to {_o}
 		return {_r::*}
 
 # Name: Pickup delay
