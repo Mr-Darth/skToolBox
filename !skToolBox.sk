@@ -30,7 +30,7 @@ options:
 
 
 
-	version: 1.0-BETA.8
+	version: 1.0-BETA.9
 
 option nms:
 	get:
