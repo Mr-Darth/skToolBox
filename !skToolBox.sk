@@ -1622,10 +1622,8 @@ plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] triangle 
 plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] star (at|from) %location% (with|of) [a] radius [of] %number%(,| and) [a] density [of] %number%:
 	return type: locations
 	get:
-		set {_v} to vector 0, expr-2, 0
 		loop 5 times:
-			set {_p::%loop-number%} to expr-1 ~ {_v}
-			rotate {_v} around z axis by 72
+			set {_p::%loop-number%} to expr-1 ~ (cylindrical vector expr-2, (loop-number * 72), 0)
 		set {_l::*} to (3, 4, 4, 5 and 5)
 		loop {_l::*}:
 			set {_i} to (loop-index parsed as number)th element of (1, 1, 2, 2 and 3)
