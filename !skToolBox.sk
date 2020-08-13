@@ -1475,8 +1475,8 @@ player property [total] (experience|[e]xp) [points]:
 expression:
 	return type: number
 	patterns:
-		distance [(1¦squared)] between %vector% and %vector%
-		[(1¦squared)] distance between %vector% and %vector%
+		[the] vector distance [(1¦squared)] between %vector% and %vector%
+		[the] [(1¦squared)] vector distance between %vector% and %vector%
 	get:
 		return (expr-1.distance(expr-2) if parse mark != 1, else expr-1.distanceSquared(expr-2))
 
@@ -1665,6 +1665,17 @@ world property chunk %number%(, | and) %number%:
 	return type: chunk
 	get:
 		return expr-1.getChunkAt(expr-2, expr-3)
+
+# Name: Nearest entity
+# Description: Returns the nearest entity to a location.
+# Usage: ignite the closest entity to {turretLoc}
+expression [the] (nearest|closest) entity (to|of) %location%:
+	return type: entity
+	get:
+		loop all entities:
+			set {_d} to the distance between expr-1 and loop-value
+			set {_r::%{_d}%} to loop-value
+		return first element of {_r::*}
 
 #         __  __          _       
 #        / _|/ _|        | |      
