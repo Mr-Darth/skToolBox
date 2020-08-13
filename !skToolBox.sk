@@ -412,11 +412,11 @@ livingentity property age:
 	get:
 		return try expr-1.getAge()
 	set number:
-		try expr-1.setAge((change value).intValue())
+		try expr-1.setAge(change value)
 	add number:
-		try expr-1.setAge((try expr-1.getAge()) + (change value).intValue())
+		try expr-1.setAge((try expr-1.getAge()) + (change value))
 	remove number:
-		try expr-1.setAge((try expr-1.getAge()) - (change value).intValue())
+		try expr-1.setAge((try expr-1.getAge()) - (change value))
 
 # Name: Split string every x characters
 # Description: Splits a string by every x characters.
@@ -424,11 +424,11 @@ livingentity property age:
 plural expression:
 	return type: strings
 	patterns:
-		%string% split [(by|at)] every %number% char[acter]s
-		split %string% [(by|at)] every %number% char[acter]s
+		%string% split [(by|at)] every %number% char[acter][s]
+		split %string% [(by|at)] every %number% char[acter][s]
 	get:
 		return expr-1 if expr-2 <= 0
-		return ...Splitter.fixedLength(expr-2.intValue()).split(expr-1)
+		return ...Splitter.fixedLength(expr-2).split(expr-1)
 
 # Name: Formatted numbers
 # Description: Formats the given numbers using a given decimal format.
@@ -585,7 +585,7 @@ expression [the] round[ed] %numbers% (at|with|by|to) %number% decimal[s] [place[
 		loop exprs-1:
 			add 1 to {_i}
 			set {_n} to loop-expression
-			set {_r::%{_i}%} to (round({_n} * 10^(expr-2.intValue()))) / 10^(expr-2.intValue())
+			set {_r::%{_i}%} to (round({_n} * 10^floor(expr-2))) / 10^floor(expr-2)
 		return {_r::*}
 
 # Name: Random UUID
@@ -602,13 +602,13 @@ expression [a] (random[i(z|s)ed]|new) uuid [(1¦without (dashes|hyphens))]:
 expression [the] char[acter] at [(index|position)] %number% in %string%:
 	return type: string
 	get:
-		return try expr-2.charAt((expr-1).intValue() - 1).toString()
+		return try expr-2.charAt((expr-1) - 1).toString()
 	set string:
 		set {_sb} to try new StringBuilder(expr-2)
-		try {_sb}.setCharAt((expr-1).intValue() - 1 and "%change value%")
+		try {_sb}.setCharAt((expr-1) - 1 and "%change value%")
 		set raw expr-2 to {_sb}.toString()
 	delete:
-		set {_sb} to try new StringBuilder(expr-2).deleteCharAt((expr-1).intValue() - 1)
+		set {_sb} to try new StringBuilder(expr-2).deleteCharAt((expr-1) - 1)
 		set raw expr-2 to {_sb}.toString()
 
 # Name: Integers with base
@@ -620,7 +620,7 @@ expression %integers% (in|to|using|with) (base|radix) %number%:
 		loop exprs-1:
 			set {_i} to {_i} + 1
 			set {_n} to loop-expression
-			set {_r::%{_i}%} to try JavaInteger.toString({_n} and expr-2.intValue())
+			set {_r::%{_i}%} to try JavaInteger.toString({_n} and expr-2)
 		return {_r::*}
 
 # Name: Random string
@@ -630,10 +630,10 @@ expression %integers% (in|to|using|with) (base|radix) %number%:
 expression random [(alphabetic[al]|1¦alphanumeric[al]|2¦ascii|3¦numeric)] [(string|text)] (of|with) length %number%:
 	return type: string
 	get:
-		return RandomStringUtils.randomAlphanumeric(expr-1.intValue()) if parse mark = 1
-		return RandomStringUtils.randomAscii(expr-1.intValue()) if parse mark = 2
-		return RandomStringUtils.randomNumeric(expr-1.intValue()) if parse mark = 3
-		return RandomStringUtils.randomAlphabetic(expr-1.intValue())
+		return RandomStringUtils.randomAlphanumeric(expr-1) if parse mark = 1
+		return RandomStringUtils.randomAscii(expr-1) if parse mark = 2
+		return RandomStringUtils.randomNumeric(expr-1) if parse mark = 3
+		return RandomStringUtils.randomAlphabetic(expr-1)
 
 # Name: Midnight
 # Description: Returns the date of midnight.
@@ -681,7 +681,7 @@ expression [the] [regex] [(captur(e|ing)|matching)] group %number% of %object%:
 		expr-2 is instance of Matcher
 		expr-2.reset()
 		expr-2.find() is true
-		return try expr-2.group(expr-1.intValue()) 
+		return try expr-2.group(expr-1) 
 
 # Name: Glowing item
 # Description: Returns a glowing version of an item.
@@ -1097,17 +1097,17 @@ block property [(contained|deposited|stored)] (water|fluid|liquid) level:
 	set number:
 		try expr-1.getBlockData() is instance of Levelled
 		set {_b} to expr-1.getBlockData()
-		{_b}.setLevel((change value).intValue())
+		{_b}.setLevel(change value)
 		expr-1.setBlockData({_b})
 	add number:
 		try expr-1.getBlockData() is instance of Levelled
 		set {_b} to expr-1.getBlockData()
-		try {_b}.setLevel(expr-1.getBlockData().getLevel() + (change value).intValue())
+		try {_b}.setLevel(expr-1.getBlockData().getLevel() + (change value))
 		expr-1.setBlockData({_b})
 	remove number:
 		try expr-1.getBlockData() is instance of Levelled
 		set {_b} to expr-1.getBlockData()
-		try {_b}.setLevel((expr-1.getBlockData().getLevel()) - (change value).intValue())
+		try {_b}.setLevel((expr-1.getBlockData().getLevel()) - (change value))
 		expr-1.setBlockData({_b})
 	reset:
 		try expr-1.getBlockData() is instance of Levelled
@@ -1274,7 +1274,7 @@ object property bad omen level:
 		return expr-1.getBadOmenLevel()
 	set number:
 		expr-1 is instance of Raid
-		try expr-1.setBadOmenLevel((change value).intValue())
+		try expr-1.setBadOmenLevel(change value)
 
 # Name: Raid location
 # Description: Gets the location of a raid.
@@ -1456,12 +1456,12 @@ player property [total] (experience|[e]xp) [points]:
 	set number:
 		set expr-1's level to 0
 		set expr-1's level progress to 0
-		expr-1.giveExp((change value).intValue())
+		expr-1.giveExp(change value)
 	add number:
-		expr-1.giveExp((change value).intValue())
+		expr-1.giveExp(change value)
 	remove number:
 		set {_xp} to calcExperience((expr-1's level).longValue())
-		set {_setTo} to {_xp} - (change value).intValue()	
+		set {_setTo} to {_xp} - (change value)
 		set expr-1's level to 0
 		set expr-1's level progress to 0
 		expr-1.giveExp({_setTo})
@@ -1658,6 +1658,14 @@ block property piston [mov(e|ing)] reaction:
 	get:
 		return PistonReactions.values()[PistonReactions.ordinal(expr-1.getPistonMoveReaction())]
 
+# Name: Chunk of world
+# Description: Returns the chunk in a world from the x and y chunk coordinates.
+# Usage: set {_ch} to chunk 1, 3 of player's world
+world property chunk %number%(, | and) %number%:
+	return type: chunk
+	get:
+		return expr-1.getChunkAt(expr-2, expr-3)
+
 #         __  __          _       
 #        / _|/ _|        | |      
 #    ___| |_| |_ ___  ___| |_ ___ TM
@@ -1788,9 +1796,9 @@ effect make %block% (appear|show|look) [as] (0¦close[d]|1¦open[ed]) [for %-pla
 # Usage: rotate all players by 3 horizontally and 7 vertically
 effect rotate %players% by %number% [horizontally] [[and] %-number% [vertically]]:
 	trigger:
+		set {_packet} to new play_server_position packet
 		loop exprs-1:
 			set {_p} to loop-expression
-			set {_packet} to new play_server_position packet
 			set double field 0 of {_packet} to {_p}'s x-pos
 			set double field 1 of {_packet} to {_p}'s y-pos
 			set double field 2 of {_packet} to {_p}'s z-pos
@@ -1930,6 +1938,17 @@ effect paste schematic %string% at %location% [(1¦(with|including) air)]:
 		set {_pos} to BlockVector3.at((x-pos of expr-2), (y-pos of expr-2), (z-pos of expr-2))
 		set {_includeAir} to true if parse mark = 1, else false
 		await ClipboardFormats.findByFile({_schematic}).load({_schematic}).paste(new BukkitWorld(world of expr-2), {_pos}, true, {_includeAir}, null)
+
+# Name: Show totem animation
+# Description: Displays the totem of undying animation to the given players.
+# Usage: show totem animation to {_team::red::*}
+effect (play|show|display) [the] totem [of undying] animation (to|for) %players%:
+	trigger:
+		set {_packet} to new play_server_entity_status packet
+		loop exprs-1:
+			set int field 0 of {_packet} to loop-expression.getEntityId()
+			set byte field 0 of {_packet} to 35
+			send loop-expression packet {_packet}
 
 #                       _ _ _   _                 
 #                      | (_) | (_)                
