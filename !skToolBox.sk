@@ -1513,33 +1513,33 @@ plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] line (bet
 	get:
 		set {_vector1} to vector from expr-1
 		set {_vector2} to vector from expr-2
-		set {_points} to ({_vector1}.distance({_vector2}) * expr-3) + 1
+		set {_points} to floor({_vector1}.distance({_vector2}) * expr-3) + 1
 		set {_d} to (vector from expr-1 to expr-2).multiply(1 / {_points})
 		loop {_points} times:
 			set {_r::%loop-number%} to (location at 0, 0, 0 in expr-1's world) ~ ({_d}.clone().multiply(loop-number) ++ {_vector1})
 		return {_r::*}
 
 # Name: Circle
-# Description: Returns the points of a circle from the center, radius and density. 
+# Description: Returns the points of a circle from the center, radius, and density. 
 #              The density controls the distance between each point.
 # Usage: show happy villager at a circle at player with radius 7, density 3
 plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] circle (at|from) %location% (with|of) [a] radius [of] %number%(,| and) [with] [a] density [of] %number%:
 	return type: locations
 	get:
-		set {_points} to (expr-2 * expr-3 * 3.141592653589793)
+		set {_points} to floor(expr-2 * expr-3 * 3.141592653589793)
 		set {_angle} to 360 / {_points}
 		loop {_points} times:
 			set {_r::%loop-number%} to expr-1  ~ (new cylindrical vector from expr-2, (loop-number * {_angle}), 0)
 		return {_r::*}
 
 # Name: Sphere
-# Description: Returns the points of a sphere from its center, radius and density.
+# Description: Returns the points of a sphere from its center, radius, and density.
 #              The density controls the distance between each point.
 # Usage: show smoke at points of a sphere at player with a radius of 10 and a density of 1
 plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] sphere (at|from) %location% (with|of) [a] radius [of] %number%(,| and) [with] [a] density [of] %number%:
 	return type: locations
 	get:
-		set {_points} to (expr-2 * expr-3 * 3.141592653589793)
+		set {_points} to floor(expr-2 * expr-3 * 3.141592653589793)
 		set {_dy} to 360 / {_points}
 		set {_dp} to 360 / {_points}
 		loop ({_points} ^ 2) times:
@@ -1552,14 +1552,14 @@ plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] sphere (a
 		return {_r::*}
 
 # Name: Helix
-# Description: Returns the points of a helix from a location, radius, step, height and density.
+# Description: Returns the points of a helix from a location, radius, step, height, and density.
 #              The density controls the distance between each point.
 #              A negative slope will reverse the rotation of the helix.
 # Usage: show green spark at helix at player with radius 3, height 10, step 3, density 5
 plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] helix (at|from) %location% (of|with) [a] radius [of] %number%(,| and) [with] [a] height [of] %number%(,| and) [with] [a] [height] (step|increase|slope) [of] %number%(,| and) [with] [a] density [of] %number%:
 	return type: locations
 	get:
-		set {_points} to (expr-2 * expr-3 * expr-5 * 2 * 3.141592653589793)
+		set {_points} to floor(expr-2 * expr-3 * expr-5 * 2 * 3.141592653589793)
 		set {_da} to (360 * expr-3 / (expr-4 * {_points}))
 		set {_dh} to expr-3 / {_points}
 		loop {_points} times:
@@ -1582,12 +1582,24 @@ plural expression:
 			set {_v::%{_i}%} to vector from {_l}
 		loop {_v::*}:
 			loop {_v::*}:
-				set {_points} to (loop-value-1.distance(loop-value-2) * expr-2) + 1
+				set {_points} to floor((loop-value-1.distance(loop-value-2) * expr-2) + 1)
 				set {_d} to (loop-value-2 -- loop-value-1).multiply(1 / {_points})
 				loop {_points} times:
 					set {_o} to (location at 0, 0, 0 in (first element of exprs-1)'s world) ~ ({_d}.clone().multiply(loop-number) ++ loop-value-1)
-					set {_r::%{_o}%} to {_o}
+					set {_r::%{_o}%} to {_o} if {_r::%{_o}%} is not set
 		return {_r::*}
+
+# Name: Triangle
+# Description: Returns the points of a triangle from the center, radius, and density
+#              The density controls the distance between each point.
+# Usage: show happy villager at triangle at player with radius 3 and density 1
+# Note: Requires the `Linked locations` expression.
+plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] triangle (at|from) %location% (with|of) [a] radius [of] %number%(,| and) [with] [a] density [of] %number%:
+	return type: locations
+	get:
+		loop 3 times:
+			set {_r::%loop-number%} to expr-1  ~ (cylindrical vector from expr-2, (120 * loop-number), 0)
+		return link {_r::*} with density expr-3
 
 # Name: Pickup delay
 # Description: Get or change the delay before an item will be available to be picked up by players.
