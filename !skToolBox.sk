@@ -30,7 +30,7 @@ options:
 
 
 
-	version: 1.0-BETA.9
+	version: 1.0.1
 
 option nms:
 	get:
@@ -830,19 +830,6 @@ expression %item/itemtype% (colo[u]red|dyed|painted) %color%:
 		set {_r} to expr-1
 		dye {_r} expr-2
 		return {_r}
-
-# Name: Kick reason
-# Description: Returns or set the reason of a kick in the kick event.
-# Usage: send "%kick reason%" 
-expression [the] [event-]kick (reason|message):
-	return type: string
-	parse:
-		continue if ScriptLoader.isCurrentEvent(class "org.bukkit.event.player.PlayerKickEvent") = true    
-		Skript.error("Cannot use 'kick reason' outside of the kick event" and ErrorQuality.SEMANTIC_ERROR)
-	get:
-		return event.getReason()
-	set string:
-		event.setReason(change value)
 
 # Name: Moon phase
 # Description: Returns the moon phase in a world.
