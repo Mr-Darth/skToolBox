@@ -53,6 +53,7 @@ import:
 	java.lang.management.RuntimeMXBean
 	java.io.File
 	java.lang.Runnable
+	java.util.Base64
 
 	org.bukkit.Bukkit
 	org.bukkit.map.MinecraftFont	
@@ -95,6 +96,7 @@ import:
 	ch.njol.skript.variables.Variables
 	ch.njol.skript.ServerPlatform
 	ch.njol.skript.lang.VariableString
+	ch.njol.skript.registrations.Classes
 
 	com.google.common.base.Splitter
 
@@ -112,6 +114,7 @@ import:
 	com.sk89q.worldedit.bukkit.BukkitWorld
 
 	org.bukkit.craftbukkit.{@nms}.entity.CraftEntity
+	net.minecraft.server.{@nms}.EnumHand
 
 #
 #       _                           _                              _               _             
@@ -1712,6 +1715,45 @@ world property sea level:
 	get:
 		return expr-1.getSeaLevel()
 
+# Name: Height/width of entity
+# Description: Returns the height/width of an entity.
+# Usage: send "Height of %arg-1's name%: %arg-1's height%"
+entity property (1¦height|width):
+	return type: number
+	get:
+		return expr-1.getHeight() if parse mark = 1, else expr-1.getWidth()
+
+# Name: List index
+# Description: Returns the index of an object in a list.
+# Usage: set {_i} to index of player in {queue::*}
+expression index of %object% in list %~objects%:
+	return type: string
+	get:
+		loop ...Variables.getVariable((raw exprs-2).getName().toString(event), event, (raw exprs-2).isLocal()).entrySet():
+			return loop-value.getKey() if loop-value.getValue() is expr-1
+		return
+
+# Name: Serialized object
+# Description: Serialized the given object.
+# Usage: set {_st} to serialized tool
+# Note: Some objects can't be serialized and an error will be thrown in console.
+expression serialize[d] %object%:
+	return type: string
+	get:
+		set {_class} to last element of (split "%class of expr-1%" at ".") 
+		set {_data} to Base64.getEncoder().encodeToString(Classes.serialize(expr-1).data)
+		return "%{_class} in lowercase%:%{_data}%"
+
+# Name: Deserialized string
+# Description: Deserializes the given string.
+# Usage: set tool of player to deserialized {_st}
+expression deserialize[d] %string%:
+	return type: object
+	get:
+		set {_class} to subtext of expr-1 from indices 1 to (index of ":" in expr-1) - 1
+		set {_data} to Base64.getDecoder().decode(subtext of expr-1 from (index of ":" in expr-1) + 1 to (length of expr-1))
+		return Classes.deserialize({_class}, {_data})
+
 #         __  __          _       
 #        / _|/ _|        | |      
 #    ___| |_| |_ ___  ___| |_ ___ TM
@@ -1723,7 +1765,7 @@ world property sea level:
 # Name: Make players swing
 # Description: Force certain players to swing their arms for other players.
 # Usage: make player swing for targeted player
-effect (make|force) %player% [to] swing [[(with|using) [the]] (0¦[main ]hand|3¦off[ ]hand)] [for %-players%]:
+effect (make|force) %player% [to] swing [[(with|using) [the]] (0¦main[ ]hand|3¦off[ ]hand)] [for %-players%]:
 	trigger:
 		set {_packet} to new play_server_animation packet
 		set int field 0 of {_packet} to expr-1.getEntityId()
@@ -1998,12 +2040,28 @@ effect (play|show|display) [the] totem [of undying] animation (to|for) %players%
 
 # Name: Call function
 # Description: Calls a function with the given arguments.
+#              The function can be called asynchronously.
 # Usage: call function "sendMsgToStaff" with args "hello there"
-effect (call|run|execute) function %string% [(with|using) [[the] arg[ument][s]] %-objects%]:
+effect (call|run|execute) function %string% [(1¦async[hronously])] [(with|using) [[the] arg[ument][s]] %-objects%]:
 	trigger:
 		set {_f::run} to function reference expr-1 called with exprs-2
 		set {_proxy} to new proxy instance of Runnable using {_f::*}
-		{_proxy}.run()
+		if parse mark = 1:
+			await {_proxy}.run()
+		else:
+			{_proxy}.run()
+
+# Name: Make player eat
+# Description: Makes a player insta-eat the item from the mainhand/offhand.
+#              The player must hold an edible item.
+# Usage: make all players eat with the offhand
+effect (make|force) %players% [to] eat [with [the] (1¦main[ ]hand|2¦off[ ]hand)]:
+	trigger:	
+		set {_hand} to (EnumHand.OFF_HAND if parse mark = 2, else EnumHand.MAIN_HAND)
+		loop exprs-1:
+			set {_handle} to loop-expression.getHandle()
+			{_handle}.c({_hand})
+			{_handle}.s()
 
 #                       _ _ _   _                 
 #                      | (_) | (_)                
@@ -2149,6 +2207,13 @@ condition %entity% has[(1¦(n't| not))] [got] [a] line of sight to %entity%:
 	check:
 		negate the condition if parse mark = 1
 		continue if expr-1.hasLineOfSight(expr-2)
+
+# Name: Entity is wet
+# Description: Checks if an entity is wet (in water or rain).
+# Usage: if player is wet:
+entity property condition (wet|in (water|rain)|in water(,| or) rain):
+	check:
+		continue if expr-1.getHandle().isInWaterOrRain() = true
 
 
 
