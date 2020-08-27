@@ -115,6 +115,7 @@ import:
 
 	org.bukkit.craftbukkit.{@nms}.entity.CraftEntity
 	net.minecraft.server.{@nms}.EnumHand
+	org.bukkit.craftbukkit.{@nms}.inventory.CraftItemStack
 
 #
 #       _                           _                              _               _             
@@ -1022,13 +1023,25 @@ plural expression:
 # Name: Stored enchantments
 # Description: Returns the stored enchantments in a book.
 # Usage: set {_ench::*} to stored enchantments of player's tool
-plural object property stored enchant(s|ments):
+plural itemtype property stored enchant(s|ments):
 	return type: enchantment types
 	get:
 		set {_meta} to try (random item of expr-1).getItemMeta()
 		loop ...try {_meta}.getStoredEnchants().entrySet():
 			set {_e::%loop-value.getKey()%} to try new EnchantmentType(loop-value.getKey() and loop-value.getValue())
 		return {_e::*}
+	add enchantment type:
+		set {_meta} to try (random item of expr-1).getItemMeta()
+		try {_meta}.getStoredEnchants() is set
+		{_meta}.addStoredEnchant((change value).getType(), (change value).getLevel(), true)
+		expr-1.setItemMeta({_meta})
+	remove enchantment:
+		set {_meta} to try (random item of expr-1).getItemMeta()
+		try {_meta}.getStoredEnchants() is set
+		{_meta}.removeStoredEnchant(change value)
+		expr-1.setItemMeta({_meta})
+	delete:
+		expr-1.setItemMeta((random item of enchanted book).getItemMeta())
 
 # Name: Health scale
 # Description: Get or set the health scale of a player.
@@ -1562,8 +1575,7 @@ plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] sphere (a
 		set {_dy} to 360 / {_points}
 		set {_dp} to 360 / {_points}
 		loop ({_points} ^ 2) times:
-			set {_s} to loop-number
-			set {_r::%{_s}%} to expr-1 ~ (new spherical vector expr-2, {_y}, {_p})
+			set {_r::%loop-number%} to expr-1 ~ (new spherical vector expr-2, {_y}, {_p})
 			add {_dp} to {_p}
 			floor(mod(loop-number, {_points})) = 0
 			add {_dy} to {_y}
@@ -1633,6 +1645,44 @@ plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] star (at|
 		loop {_l::*}:
 			set {_i} to (loop-index parsed as number)th element of (1, 1, 2, 2 and 3)
 			set {_r::*} to {_r::*} and line between {_p::%{_i}%} and {_p::%loop-value%} with density expr-3
+		return {_r::*}
+
+# Name: Ellipse
+# Description: Returns the points of the outline of an ellipse from the x and z radiuses and the density.
+#              The density controls the distance between each point.
+# Usage: show happy villager at ellipse at event-entity with x-radius 3, z-radius 9, density 1
+plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a[n]] ellipse (at|from) %location% (with|of) [a] x(-| )radius [of] %number%(,| and) [a] z(-| )radius [of] %number%(,| and) [with] [a] density [of] %number%:
+	return type: locations
+	get:
+		set {_points} to floor(3.141592653589793 * (3 * (expr-2 + expr-3) - sqrt((3 * expr-2 + expr-3) * (expr-2 + 3 * expr-3))) * expr-4) 
+		set {_angle} to 360 / {_points}
+		loop {_points} times:
+			set {_r} to (expr-2 * expr-3) / (sqrt(expr-2^2 * sin({_cangle})^2 + expr-3^2 * cos({_cangle})^2))
+			set {_r::%loop-number%} to expr-1 ~ (cylindrical vector {_r}, loop-number * {_angle}, 0)
+			add {_angle} to {_cangle}
+		return {_r::*}
+
+# Name: Ellipsoid
+# Description: Returns the points of an ellipsoid from three coordinate axes and density.
+#              The density controls the distance between each point.
+# Usage: show smoke at (ellipsoid at block 10 in front of player with x-radius 3, y-radius 10, z-radius 9, density 1)
+plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a[n]] ellipsoid (at|from) %location% (with|of) [a] x(-| )radius [of] %number%(,| and) [a] y(-| )radius [of] %number%(,| and) [a] z(-| )radius [of] %number%(,| and) [with] [a] density [of] %number%:
+	return type: locations
+	get:
+		set {_a} to expr-2^1.6075 
+		set {_b} to expr-3^1.6075 
+		set {_c} to expr-4^1.6075
+		set {_points} to (4 * 3.141592653589793 * (({_a} * {_b} + {_a} * {_c} + {_b} * {_c}) / 3)^(1 / 1.6075) * (expr-5 / 20)) 
+		set {_dy} to 360 / {_points}
+		set {_dp} to 360 / {_points}
+		loop {_points}^2 times:
+			add 1 to {_s}
+			set {_r} to (expr-2 * expr-3 * expr-4) / (sqrt(expr-3^2 * expr-4^2 * cos({_y})^2 * cos({_p})^2 + expr-2^2 * (expr-4^2 * cos({_p})^2 * sin({_y})^2 + expr-3^2 * sin({_p})^2)))
+			set {_r::%{_s}%} to expr-1 ~ (new spherical vector {_r}, {_y}, {_p})
+			add {_dp} to {_p}
+			floor(mod(loop-number, {_points})) = 0
+			add {_dy} to {_y}
+			set {_p} to 0
 		return {_r::*}
 
 # Name: Pickup delay
@@ -1727,7 +1777,7 @@ expression index of %object% in list %~objects%:
 expression serialize[d] %object%:
 	return type: string
 	get:
-		set {_class} to last element of (split "%class of expr-1%" at ".") 
+		set {_class} to last element of (split "%class of expr-1%" at ".")
 		set {_data} to Base64.getEncoder().encodeToString(Classes.serialize(expr-1).data)
 		return "%{_class} in lowercase%:%{_data}%"
 
