@@ -1657,7 +1657,7 @@ plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a[n]] ellips
 		set {_points} to floor(3.141592653589793 * (3 * (expr-2 + expr-3) - sqrt((3 * expr-2 + expr-3) * (expr-2 + 3 * expr-3))) * expr-4) 
 		set {_angle} to 360 / {_points}
 		loop {_points} times:
-			set {_r} to (expr-2 * expr-3) / (sqrt(expr-2^2 * sin({_cangle})^2 + expr-3^2 * cos({_cangle})^2))
+			set {_r} to (expr-2 * expr-3) / (sqrt(expr-3^2 * sin({_cangle})^2 + expr-2^2 * cos({_cangle})^2))
 			set {_r::%loop-number%} to expr-1 ~ (cylindrical vector {_r}, loop-number * {_angle}, 0)
 			add {_angle} to {_cangle}
 		return {_r::*}
@@ -1669,15 +1669,15 @@ plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a[n]] ellips
 plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a[n]] ellipsoid (at|from) %location% (with|of) [a] x(-| )radius [of] %number%(,| and) [a] y(-| )radius [of] %number%(,| and) [a] z(-| )radius [of] %number%(,| and) [with] [a] density [of] %number%:
 	return type: locations
 	get:
-		set {_a} to expr-2^1.6075 
-		set {_b} to expr-3^1.6075 
-		set {_c} to expr-4^1.6075
+		set {_a} to expr-4^1.6075 
+		set {_b} to expr-2^1.6075 
+		set {_c} to expr-3^1.6075
 		set {_points} to (4 * 3.141592653589793 * (({_a} * {_b} + {_a} * {_c} + {_b} * {_c}) / 3)^(1 / 1.6075) * (expr-5 / 20)) 
 		set {_dy} to 360 / {_points}
 		set {_dp} to 360 / {_points}
 		loop {_points}^2 times:
 			add 1 to {_s}
-			set {_r} to (expr-2 * expr-3 * expr-4) / (sqrt(expr-3^2 * expr-4^2 * cos({_y})^2 * cos({_p})^2 + expr-2^2 * (expr-4^2 * cos({_p})^2 * sin({_y})^2 + expr-3^2 * sin({_p})^2)))
+			set {_r} to (expr-2 * expr-3 * expr-4) / (sqrt(expr-2^2 * expr-3^2 * cos({_y})^2 * cos({_p})^2 + expr-4^2 * (expr-3^2 * cos({_p})^2 * sin({_y})^2 + expr-2^2 * sin({_p})^2)))
 			set {_r::%{_s}%} to expr-1 ~ (new spherical vector {_r}, {_y}, {_p})
 			add {_dp} to {_p}
 			floor(mod(loop-number, {_points})) = 0
