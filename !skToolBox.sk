@@ -2305,6 +2305,13 @@ itemtype property condition occluding:
 	check:
 		continue if (random item of expr-1).getType().isOccluding() = true
 
+# Name: Itemtype is unbreakable
+# Description: Checks if an item is unbreakable.
+# Usage: send "Your tool is not unbreakable" if tool of player is not unbreakable
+itemtype property condition unbreakable:
+	check:
+		continue if expr-1.getItemMeta().isUnbreakable() = true
+
 
 
 #
