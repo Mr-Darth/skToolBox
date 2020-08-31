@@ -1791,6 +1791,25 @@ expression deserialize[d] %string%:
 		set {_data} to Base64.getDecoder().decode(subtext of expr-1 from (index of ":" in expr-1) + 1 to (length of expr-1))
 		return Classes.deserialize({_class}, {_data})
 
+# Name: Fishing time
+# Description: The lure/catch time of a hook.
+#              The lure time represents the time until the fish will start going towards the hook.
+#              The bite time represents the time until the fish will bite.
+# Usage: set catch time of hook to 10 ticks
+entity property (lure|1¦(catch|bite)) time:
+	return type: timespan 
+	get:
+		return if expr-1 is not a fish hook
+		set {_hook} to expr-1.getHandle()
+		return new Timespan(({_hook}.ai if parse mark is 1, else {_hook}.ah) * 50)
+	set timespan:
+		expr-1 is a fish hook
+		set {_hook} to expr-1.getHandle()
+		if parse mark is 1:
+			set {_hook}.ai to (change value).getTicks_i()
+		else:
+			set {_hook}.ah to (change value).getTicks_i()
+
 #         __  __          _       
 #        / _|/ _|        | |      
 #    ___| |_| |_ ___  ___| |_ ___ TM
@@ -2100,6 +2119,28 @@ effect (make|force) %players% [to] eat [with [the] (1¦main[ ]hand|2¦off[ ]hand
 			{_handle}.c({_hand})
 			{_handle}.s()
 
+# Name: Open book
+# Descriptions: Opens a book for the given players.
+# Isage: open tool of player to all players
+effect (show|open) book %itemtype% to %players%:
+	trigger:
+		set {_book} to random item of expr-1
+		{_book}'s type is a written book
+		loop exprs-2:
+			loop-expression.openBook({_book})
+
+# Name: Open sign
+# Descriptions: Opens a sign for the given players. The sign can be edited.
+# Usage: open sign targeted block to all players
+effect (show|open) sign %block% to %players%:
+	parse:
+		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
+		Skript.error("The 'make pathfind' effect is not supported on this server software")
+	trigger:
+		set {_sign} to expr-1.getState()
+		loop exprs-2:
+			loop-expression.openSign({_sign})
+
 #                       _ _ _   _                 
 #                      | (_) | (_)                
 #    ___ ___  _ __   __| |_| |_ _  ___  _ __  ___ TM
@@ -2248,9 +2289,21 @@ condition %entity% has[(1¦(n't| not))] [got] [a] line of sight to %entity%:
 # Name: Entity is wet
 # Description: Checks if an entity is wet (in water or rain).
 # Usage: if player is wet:
-entity property condition (wet|in (water|rain)|in water(,| or) rain):
+entity property condition (wet|in (1¦water|2¦rain)|in water(,| or) rain):
 	check:
-		continue if expr-1.getHandle().isInWaterOrRain() = true
+		if parse mark = 1:
+			continue if expr-1.getHandle().isInWater() = true
+		else if parse mark = 2:
+			continue if expr-1.getHandle().isInRain() = true
+		else:
+			continue if expr-1.getHandle().isInWaterOrRain() = true
+
+# Name: Itemtype is occluding
+# Description: Check if the itemtype is a block and completely blocks vision.
+# Usage: if event-block's type is occluding:
+itemtype property condition occluding:
+	check:
+		continue if (random item of expr-1).getType().isOccluding() = true
 
 
 
