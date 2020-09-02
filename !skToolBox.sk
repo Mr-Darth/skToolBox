@@ -77,6 +77,7 @@ import:
 	org.bukkit.inventory.MerchantRecipe
 	org.bukkit.inventory.StonecuttingRecipe
 	org.bukkit.inventory.meta.Repairable
+	org.bukkit.entity.ThrowableProjectile
 
 	com.destroystokyo.paper.entity.Pathfinder$PathResult
 
@@ -1817,6 +1818,18 @@ entity property (lure|1¦(catch|bite)) time:
 		else:
 			set {_hook}.ah to (change value).getTicks_i()
 
+# Name: Projectile item
+# Description: The item of a throwable projectile (e.g. snowball). Can be set.
+# Usage: set shot item of last shot snowball to dirt
+projectile property [(projectile|shot)] item:
+	return type: itemtype
+	get:
+		return if expr-1 is not instance of ThrowableProjectile
+		return expr-1.getItem()
+	set itemtype:
+		expr-1 is instance of ThrowableProjectile
+		expr-1.setItem(random item of change value)
+
 #         __  __          _       
 #        / _|/ _|        | |      
 #    ___| |_| |_ ___  ___| |_ ___ TM
@@ -2127,7 +2140,7 @@ effect (make|force) %players% [to] eat [with [the] (1¦main[ ]hand|2¦off[ ]hand
 			{_handle}.s()
 
 # Name: Open book
-# Descriptions: Opens a book for the given players.
+# Description: Opens a book for the given players.
 # Isage: open tool of player to all players
 effect (show|open) book %itemtype% to %players%:
 	trigger:
@@ -2137,7 +2150,7 @@ effect (show|open) book %itemtype% to %players%:
 			loop-expression.openBook({_book})
 
 # Name: Open sign
-# Descriptions: Opens a sign for the given players. The sign can be edited.
+# Description: Opens a sign for the given players. The sign can be edited.
 # Usage: open sign targeted block to all players
 # Note: Requires Paper
 effect (show|open) sign %block% to %players%:
@@ -2148,6 +2161,17 @@ effect (show|open) sign %block% to %players%:
 		set {_sign} to expr-1.getState()
 		loop exprs-2:
 			loop-expression.openSign({_sign})
+
+# Name: Teleport async
+# Description: Teleport entities to a location asynchronously.
+# Usage: async teleport all entities to {spawn} async
+effect:
+	patterns:
+		async[hronously] teleport %entities% (to|at) %location% 
+		teleport %entities% (to|at) %location% async[hronously]
+	trigger:
+		loop exprs-1:
+			try loop-expression.teleportAsync(expr-2)
 
 #                       _ _ _   _                 
 #                      | (_) | (_)                
