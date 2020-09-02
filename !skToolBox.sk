@@ -799,12 +799,15 @@ string property [english] plural:
 		return Utils.toEnglishPlural(expr-1)
 
 # Name: Entity ID
-# Description: Returns the entity id of an entity.
+# Description: Returns the entity id of the given entities.
 # Usage: set int field 0 of {_packet} to entity id of {_t}
-entity property e[ntity][ ]id[entifier]:
-	return type: integer
+entities property e[ntity][ ]id[entifier][s]:
+	return type: integers
 	get:
-		return expr-1.getEntityId()
+		loop exprs-1:
+			set {_eid} to loop-expression.getEntityId()
+			set {_r::%{_eid}%} to {_eid}
+		return {_r::*}
 
 # Name: Pixel width 
 # Description: Returns the pixel width of a given string.
@@ -1362,8 +1365,12 @@ object property [total] wave(s| count):
 # Name: Origin
 # Description: Returns the location where the entity originates from.
 # Usage: teleport victim to victim's origin
+# Note: Requires Paper
 entity property origin:
 	return type: location
+	parse:
+		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
+		Skript.error("The 'origin' expression is not supported on this server software")
 	get:
 		return expr-1.getOrigin()
 
@@ -2132,10 +2139,11 @@ effect (show|open) book %itemtype% to %players%:
 # Name: Open sign
 # Descriptions: Opens a sign for the given players. The sign can be edited.
 # Usage: open sign targeted block to all players
+# Note: Requires Paper
 effect (show|open) sign %block% to %players%:
 	parse:
 		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
-		Skript.error("The 'make pathfind' effect is not supported on this server software")
+		Skript.error("The 'open sign' effect is not supported on this server software")
 	trigger:
 		set {_sign} to expr-1.getState()
 		loop exprs-2:
@@ -2289,14 +2297,18 @@ condition %entity% has[(1¦(n't| not))] [got] [a] line of sight to %entity%:
 # Name: Entity is wet
 # Description: Checks if an entity is wet (in water or rain).
 # Usage: if player is wet:
+# Note: Requires Paper
 entity property condition (wet|in (1¦water|2¦rain)|in water(,| or) rain):
+	parse:
+		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
+		Skript.error("The 'is in liquid' condition is not supported on this server software")
 	check:
 		if parse mark = 1:
-			continue if expr-1.getHandle().isInWater() = true
+			continue if expr-1.isInWater() = true
 		else if parse mark = 2:
-			continue if expr-1.getHandle().isInRain() = true
+			continue if expr-1.isInRain() = true
 		else:
-			continue if expr-1.getHandle().isInWaterOrRain() = true
+			continue if expr-1.isInWaterOrRain() = true
 
 # Name: Itemtype is occluding
 # Description: Check if the itemtype is a block and completely blocks vision.
@@ -2311,6 +2323,17 @@ itemtype property condition occluding:
 itemtype property condition unbreakable:
 	check:
 		continue if expr-1.getItemMeta().isUnbreakable() = true
+
+# Name: Entity is in lava
+# Description: Checks if an entity is in lava
+# Usage: send "BURRRRRRRRRRRRRRRRNING" if player is in lava
+# Note: Requires Paper
+entity property condition in lava:
+	parse:
+		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
+		Skript.error("The 'is in liquid' condition is not supported on this server software")
+	check:
+		continue if expr-1.isInLava() = true
 
 
 
