@@ -1662,12 +1662,13 @@ plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] star (at|
 plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a[n]] ellipse (at|from) %location% (with|of) [a] x(-| )radius [of] %number%(,| and) [a] z(-| )radius [of] %number%(,| and) [with] [a] density [of] %number%:
 	return type: locations
 	get:
-		set {_points} to floor(3.141592653589793 * (3 * (expr-2 + expr-3) - sqrt((3 * expr-2 + expr-3) * (expr-2 + 3 * expr-3))) * expr-4) 
+		set {_h} to ((expr-2) - (expr-3)) / (expr-2 + expr-3)
+		set {_points} to 3.141592653589793 * (expr-2 + expr-3) * ((135168 - (85760 * {_h}) - (5568 * {_h}^2) - (3687 * {_h}^3)) / (135168 - (119552 * {_h}) + (22208 * {_h}^2) - (345 * {_h}^3))) * expr-4
 		set {_angle} to 360 / {_points}
 		loop {_points} times:
-			set {_r} to (expr-2 * expr-3) / (sqrt(expr-3^2 * sin({_cangle})^2 + expr-2^2 * cos({_cangle})^2))
-			set {_r::%loop-number%} to expr-1 ~ (cylindrical vector {_r}, loop-number * {_angle}, 0)
 			add {_angle} to {_cangle}
+			set {_r} to (expr-2 * expr-3) / sqrt((expr-3 * cos({_cangle})^2) + (expr-2 * sin({_cangle})^2))
+			set {_r::%{_cangle}%} to expr-1 ~ (cylindrical vector {_r}, {_cangle}, 0) 
 		return {_r::*}
 
 # Name: Ellipsoid
