@@ -1,1220 +1,315 @@
 #
-#       _ _______          _ ____ 
-#      | |__   __|        | |  _ \ 
+#       _ _______          _ ____
+#      | |__   __|        | |  _ \
 #   ___| | _| | ___   ___ | | |_) | _____  __TM
-#  / __| |/ / |/ _ \ / _ \| |  _ < / _ \ \/ /     
+#  / __| |/ / |/ _ \ / _ \| |  _ < / _ \ \/ /
 #  \__ \   <| | (_) | (_) | | |_) | (_) >  <
 #  |___/_|\_\_|\___/ \___/|_|____/ \___/_/\_\
 #
 
 # Requirements:
-#   Skript (Tested with 2.5-beta2)
-#   skript-reflect 2.1.0
+#   Skript (Tested with 2.6-alpha1)
+#   skript-reflect (Tested with the latest build from GitHub - https://github.com/TPGamesNL/skript-reflect/actions)
 #   ThatPacketAddon (Tested with 1.0-BETA.3)
 
-# Tested on Paper 1.16.2
+# Tested on Airplane, 1.16.5
 
-# If you encountered any issue, feel free to open an issue on GitHub:
-#  https://github.com/Mr-Darth/skToolBox/issues
+# If you encounter any issue, feel free to report it on GitHub:
+# 	https://github.com/Mr-Darth/skToolBox/issues
 
-options:
-	update-checker: true
+# Please do not edit anything below unless you know what you are doing!
 
-
-
-#                    !!!    [ Warning ]    !!!                         
-# Do not change anything below unless or no support will be given!
-# Do not change anything below unless or no support will be given!
-# Do not change anything below unless or no support will be given!
-#                    !!!    [ Warning ]    !!!                     
-
-
-
-	version: 1.0.1
-
-option nms:
-	get:
-		return 4th element of split "%class of server.getServer()%" by "."
-
+# Imports :D!
 import:
-
-	java.lang.Math
 	java.text.DecimalFormat
-	java.lang.StringBuilder
-	java.io.BufferedReader
-	java.io.InputStreamReader
-	java.net.URL
-	java.util.UUID
-	java.lang.Integer as JavaInteger
-	java.util.Calendar
-	java.util.regex.Pattern as RegexPattern
-	java.util.regex.Matcher
-	java.lang.management.ManagementFactory
-	java.lang.management.RuntimeMXBean
-	java.io.File
-	java.lang.Runnable
-	java.util.Base64
-
-	org.bukkit.Bukkit
-	org.bukkit.map.MinecraftFont	
-	org.bukkit.block.data.Ageable as BlockDataAgeable
-	org.bukkit.inventory.meta.EnchantmentStorageMeta
-	org.bukkit.block.data.Levelled
-	org.bukkit.Raid
-	org.bukkit.Statistic
-	org.bukkit.inventory.ItemFlag
-	org.bukkit.Art
-	org.bukkit.Rotation
-	org.bukkit.entity.Horse$Color as HorseColor
-	org.bukkit.entity.Horse$Style as HorseStyle
-	org.bukkit.event.player.PlayerFishEvent$State as FishingState
-	org.bukkit.event.player.PlayerLoginEvent$Result as LoginResult
-	org.bukkit.Raid$RaidStatus
-	org.bukkit.block.PistonMoveReaction as PistonReactions
-	org.bukkit.inventory.ShapelessRecipe
-	org.bukkit.inventory.ShapedRecipe
-	org.bukkit.inventory.CookingRecipe
-	org.bukkit.inventory.MerchantRecipe
-	org.bukkit.inventory.StonecuttingRecipe
-	org.bukkit.inventory.meta.Repairable
-	org.bukkit.entity.ThrowableProjectile
-
-	com.destroystokyo.paper.entity.Pathfinder$PathResult
 
 	ch.njol.skript.Skript
-	ch.njol.skript.util.Timespan
-	ch.njol.skript.lang.Effect
-	ch.njol.skript.lang.TriggerItem
-	ch.njol.skript.ScriptLoader
-	ch.njol.skript.lang.Condition
-	ch.njol.skript.classes.Changer$ChangeMode
-	ch.njol.skript.classes.Changer$ChangerUtils
-	ch.njol.skript.lang.Variable
-	ch.njol.skript.util.Utils
-	ch.njol.skript.log.ErrorQuality
-	ch.njol.skript.util.SkriptColor
-	ch.njol.skript.util.EnchantmentType
-	ch.njol.skript.variables.Variables
-	ch.njol.skript.ServerPlatform
+	ch.njol.skript.log.SkriptLogger
+	ch.njol.skript.log.BlockingLogHandler
 	ch.njol.skript.lang.VariableString
-	ch.njol.skript.registrations.Classes
 
-	com.google.common.base.Splitter
-
-	org.apache.commons.lang3.RandomStringUtils
-	org.apache.commons.codec.language.Soundex
-
-	com.boydti.fawe.FaweAPI
-	com.boydti.fawe.util.EditSessionBuilder
-	com.sk89q.worldedit.world.block.BaseBlock
-	com.sk89q.worldedit.math.BlockVector3
-	com.sk89q.worldedit.regions.CuboidRegion
-	com.sk89q.worldedit.bukkit.BukkitAdapter
-	com.sk89q.worldedit.function.pattern.BlockPattern
-	com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats
-	com.sk89q.worldedit.bukkit.BukkitWorld
-
-	org.bukkit.craftbukkit.{@nms}.entity.CraftEntity
-	net.minecraft.server.{@nms}.EnumHand
-	org.bukkit.craftbukkit.{@nms}.inventory.CraftItemStack
+	org.bukkit.inventory.ItemFlag
 
 #
-#       _                           _                              _               _             
-#      | |                         | |                            | |             | |                         
-#    __| | ___ _ __   ___ _ __   __| | ___ _ __   ___ _   _    ___| |__   ___  ___| | _____ _ __ TM
-#   / _` |/ _ \ '_ \ / _ \ '_ \ / _` |/ _ \ '_ \ / __| | | |  / __| '_ \ / _ \/ __| |/ / _ \ '__|     
-#  | (_| |  __/ |_) |  __/ | | | (_| |  __/ | | | (__| |_| | | (__| | | |  __/ (__|   <  __/ |         
-#   \__,_|\___| .__/ \___|_| |_|\__,_|\___|_| |_|\___|\__, |  \___|_| |_|\___|\___|_|\_\___|_|   
-#             | |                                      __/ |                                     
-#             |_|                                     |___/                                      
-#   
-
-on load:
-	loop "skript-reflect" and "ThatPacketAddon":
-		if server.getServer().getPluginManager().getPlugin(loop-value) is not set:
-			Skript.error("&7[&6Dependency Checker&7] &fMissing addon: &c&n%loop-value%&r!")
-
-#
-#                    _       _              _               _             
-#                   | |     | |            | |             | |            
-#    _   _ _ __   __| | __ _| |_ ___    ___| |__   ___  ___| | _____ _ __ TM
-#   | | | | '_ \ / _` |/ _` | __/ _ \  / __| '_ \ / _ \/ __| |/ / _ \ '__|
-#   | |_| | |_) | (_| | (_| | ||  __/ | (__| | | |  __/ (__|   <  __/ |   
-#    \__,_| .__/ \__,_|\__,_|\__\___|  \___|_| |_|\___|\___|_|\_\___|_|   
-#         | |                                                             
-#         |_|                                                             
-#
-
-on load:
-	if {@update-checker} = true:
-		set {_br} to new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/Mr-Darth/skToolBox/master/version.txt?token=AP657WROCHRANAG5R2QBTZC7EF7BM").openStream()))
-		set {_v} to first element of ...{_br}.lines()
-		{_br}.close()
-		if "%{_v}%" != "{@version}":
-			Skript.error("&7[&6Update Checker&7] &fYou are currently running an outdated version of skToolBox! Current version: &c&n{@version}&r. Latest version: &a&n%{_v}%&r.")
-
-#
-#    ___ _ __  _   _ _ __ ___  ___ TM
-#   / _ \ '_ \| | | | '_ ` _ \/ __|
-#  |  __/ | | | |_| | | | | | \__ \
-#   \___|_| |_|\__,_|_| |_| |_|___/
-#
-
-# Name: Fishing states
-expression [[fishing] state] (0¦fishing|1¦caught fish|2¦caught entity|3¦in ground|4¦failed attempt|5¦reel in|6¦bite):
-	return type: object
-	get:
-		return FishingState.values()[parse mark]
-
-# Name: Horse colors
-expression [horse color] (0¦white|1¦creamy|2¦chestnut|3¦brown|4¦black|5¦gray|6¦dark brown):
-	return type: object
-	get:
-		return HorseColor.values()[parse mark]
-
-# Name: Horse styles
-expression [horse style] (0¦none|1¦white|2¦white field|3¦white dots|4¦black dots):
-	return type: object
-	get:
-		return HorseStyle.values()[parse mark]
-
-# Name: Login results
-expression [[(connect|login)] result] (0¦allow[ed]|1¦[(kick|server)] full|2¦[kick] ban[ned]|3¦[kick] whitelist|4¦[kick] other):
-	return type: object
-	get:
-		return LoginResult.values()[parse mark]
-
-# Name: Rotations
-expression [rotation] (0¦none|1¦clockwise 45|2¦clockwise|3¦counter clockwise 135|4¦flipped|5¦flipped 45|6¦counter clockwise|7¦counter clockwise 45):
-	return type: object
-	get:
-		return Rotation.values()[parse mark] 
-
-# Name: Painting arts
-expression:
-	return type: object
-	patterns: 
-		[[painting] art] (0¦kebab|1¦aztec|2¦alban|3¦aztec[ ]2|4¦bomb|5¦plant|6¦wasteland|7¦pool|8¦courbet|9¦sea|10¦sunset|11¦creebet|12¦wanderer|13¦graham|14¦match|15¦bust|16|stage|17¦void|18¦skull and roses|19¦wither|20¦fighters|21¦pointer|22¦pigscene|23¦burning skull|24¦skeleton|25¦donkey kong)
-	get:
-		return Art.values()[parse mark]
-
-# Name: Item flags
-expression [[item] flag[s]] (hide|hidden) (0¦enchant[ment]s|1¦attributes|2¦unbreakable|3¦destroys|4¦placed on|5¦potion[ effect]s):
-	return type: object
-	get:
-		return ItemFlag.values()[parse mark]
-
-# Name: Raid statuses
-expression [raid status] (0¦ongoing|1¦victory|2¦loss|3¦stopped):
-	return type: object
-	get:
-		return RaidStatus.values()[parse mark]
-
-# Name: Piston reactions
-expression [piston [mov(e|ing)] reaction] (0¦move|1¦(destroy|break)|2¦(block|resist)|3¦ignore[d]|4¦push only):
-	return type: object
-	get:
-		return PistonReactions.values()[parse mark]
-
-#                                                             
-#                                    (_)                
+#                                    (_)
 #    _____  ___ __  _ __ ___  ___ ___ _  ___  _ __  ___ TM
 #   / _ \ \/ / '_ \| '__/ _ \/ __/ __| |/ _ \| '_ \/ __|
 #  |  __/>  <| |_) | | |  __/\__ \__ \ | (_) | | | \__ \
 #   \___/_/\_\ .__/|_|  \___||___/___/_|\___/|_| |_|___/
-#            | |                                        
-#            |_|      
-#                                                     
+#            | |
+#            |_|
+#
 
-# Name: Opposite numbers
-# Description: Returns the opposite value of the inputted numbers.
-#              Inputting (-1 and 29.3) will return (1 and -29.3).
-# Usage: set {_opposite} to opposite number of 10
-plural expression [the] (opposite|reverse) [number[s] [(of|from)]] %numbers%:
-	return type: numbers
-	get:
-		loop exprs-1:
-			add 1 to {_i}
-			set {_value} to loop-expression
-			set {_r::%{_i}%} to {_value} * -1
-		return {_r::*}
-
-# Name: Opposite boolean
-# Description: Returns the opposite value of the inputted boolean.
-#              Inputting true will return false.
+# Name: Not boolean
+# Description: Returns the logically opposite value of the given booleans.
 # Usage: set {afk::%player%} to !{afk::%player%}
-expression ([the] (opposite|toggled) [boolean ]|not |!)%boolean%:
+expression:
+	patterns:
+		([the] (opposite|toggled|flipped) [boolean[s]]|not) %$booleans%
+		!%boolean%
 	return type: boolean
 	get:
-		return (false if expr-1 is true, else true)
+		loop exprs-1:
+			add 1 to {_index}
+			set {_output::%{_index}%} to false if loop-value is true, else true
+		return {_output::*}
 
-# Name: All plugins
-# Description: Returns a list with the name of all the running plugins on the server.
-# Usage: send "Plugins: %plugins%"
-plural expression [(all [[of] the]|the)] [(installed|running|loaded)] plugins [on [the] server]:
-	loop of: plugin
-	return type: strings
-	get:
-		loop ...server.getServer().getPluginManager().getPlugins():
-			set {_r::%loop-value%} to loop-value.getName()
-		return {_r::*}
-
-# Name: All Skript addons
-# Description: Returns a list with the name of all the running addons on the server.
-# Usage: send "Installed Skript Addons: %addons%"
-plural expression [(all [[of] the]|the)] [(installed|running|loaded)] [skript] addons [on [the] server]:
-	loop of: addon
-	return type: strings
-	get:
-		loop ...Skript.getAddons():
-			set {_r::%loop-value%} to loop-value.getName()
-		return {_r::*}
-
-# Name: Dismounted entity
-# Description: Returns the dismounted entity in the dismount event.
-# Usage: kill dismounted entity
-expression [the] [event-]dismounted(-| )entity:
-	return type: entity
-	parse:
-		continue if ScriptLoader.isCurrentEvent(class "org.spigotmc.event.entity.EntityDismountEvent") = true    
-		Skript.error("Cannot use 'dismounted entity' outside of the dismount event" and ErrorQuality.SEMANTIC_ERROR)
-	get:
-		return event.getDismounted()
-	delete:
-		event.getDismounted().remove()
-
-# Name: Timespan to seconds, ticks and milliseconds
-# Description: Returns the amount of seconds/ticks/milliseconds in a given timespan.
-# Usage: send "10 days to seconds = %10 days to seconds%"
-expression %timespan% (to|in) (0¦tick[s]|1¦(millisecond[s]|ms)|1000¦second[s]):
-	return type: number
-	get:
-		return (expr-1.getMilliSeconds() / (parse mark) if parse mark != 0, else expr-1.getTicks_i())
-
-# Name: Fishing state
-# Description: Returns the fishing state in a fishing event.
-# Usage: send "%fishing state%" 
-expression [the] [event-]fish[ing] state:
-	return type: object
-	parse:
-		continue if ScriptLoader.isCurrentEvent(class "org.bukkit.event.player.PlayerFishEvent") = true    
-		Skript.error("Cannot use 'fishing state' outside of the fish event" and ErrorQuality.SEMANTIC_ERROR)
-	get:
-		return FishingState.values()[FishingState.ordinal(event.getState())]
-
-# Name: Caught item/entity
-# Description: Returns the caught item/entity in a fishing event.
-# Usage: set caught item to diamond
-expression [the] [event-]caught (1¦(item|loot)|2¦entity):
-	return type: itemtype/entity
-	parse:
-		continue if ScriptLoader.isCurrentEvent(class "org.bukkit.event.player.PlayerFishEvent") = true    
-		Skript.error("Cannot use 'caught item/entity' outside of the fish event" and ErrorQuality.SEMANTIC_ERROR)
-	get:
-		return (new ItemType(event.getCaught().getItemStack()) if parse mark != 2, else event.getCaught())
-	set itemtype:
-		try event.getCaught().setItemStack(random item of change value)
-	delete:
-		event.getCaught().remove()
-
-# Name: Hook
-# Description: Returns the fishing hook in a fishing event.
-# Usage: kill fishing hook
-expression [the] [event-][fish[ing]] hook:
-	return type: entity
-	parse:
-		continue if ScriptLoader.isCurrentEvent(class "org.bukkit.event.player.PlayerFishEvent") = true    
-		Skript.error("Cannot use 'fishing hook' outside of the fish event" and ErrorQuality.SEMANTIC_ERROR)
-	get:
-		return event.getHook()
-	delete:
-		event.getHook().remove()
-
-# Name: Special numbers
-# Description: Returns the value of pi/Euler's number/the golden ratio.
-# Usage: set {_variable} to pi*2
+# Name: Degrees and radians conversions
+# Description: Converts degrees to radians and vice versa.
+# Usage: set {_rad} to 180 degrees as radians
 expression:
-	return type: number
 	patterns:
-		[the] [value of] (1¦pi|2¦e[uler['s] number]|3¦(phi|[the] golden ratio))
-		(1¦pi|2¦e[uler['s] number]|3¦(phi|[the] golden ratio))['s value]
-	get:
-		return (parse mark)th element of (3.141592653589793, 2.718281828459045 and 1.618033988749895)
-
-# Name: Degrees to radians
-# Description: Converts degrees to radians.
-# Usage: set {_rad} to 180 degrees to radians
-expression %number% [degrees] (in|to|as) rad[ians]:
+		%$numbers% [degree[s]] (in|to|as) rad[ian][s]
+		%$numbers% [rad[ian][s]] (in|to|as) degree[s]
 	return type: number
+	parse:
+		set {_conversions::*} to 0.017453292519943295 and 57.29577951308232
+		continue
 	get:
-		return (expr-1 * 3.141592653589793) / 180
-
-# Name: Radians to degrees
-# Description: Converts radians to degrees.
-# Usage: set {_dg} to 3.14 radians to degrees
-expression %number% [rad[ians]] (in|to|as) degrees:
-	return type: number
-	get:
-		return (expr-1 * 180) / 3.141592653589793
-
-# Name: Midpoint
-# Description: Gets the midpoint of multiple locations.
-# Usage: set block at midpoint of player and targeted player to diamond block
-locations property (midpoint|center):
-	return type: location
-	get:
-		set {_f} to 1 / (size of exprs-1)
 		loop exprs-1:
-			set {_l} to loop-expression
-			set {_v} to vector from {_l}
-			set {_midpoint} to vector ((x of {_midpoint}) + ((x of {_v}) * {_f})), ((y of {_midpoint}) + ((y of {_v}) * {_f})), ((z of {_midpoint}) + ((z of {_v}) * {_f}))
-		return (location at 0, 0, 0 in (first element of exprs-1)'s world) ~ {_midpoint}
+			add 1 to {_index}
+			set {_value} to loop-value
+			set {_output::%{_index}%} to {_value} * {_conversions::%pattern%} 
+		return {_output::*}
 
-# Name: Average value
-# Description: Returns the average value of a list of numbers.
+# Name: Mathematical constants
+# Description: Returns the value of pi or Euler's number.
+# Usage: set {_points} to {_radius} * 2 * pi
+expression [the] [value of] (pi|1¦e[uler['s]] [num[ber]]):
+	return type: number
+	get:
+		return 3.141592653589793 if parser mark is 0, else 2.718281828459045
+
+# Name: Mean
+# Description: Returns the average or geometric mean of a list of numbers.
 # Usage: set {_rating} to average value of {ratings::*}
-expression [the] (average value|arithmetic mean) (of|from) %numbers%:
+expression (average|(arithmetic|1¦geometric) mean) of %numbers%:
 	return type: number
 	get:
-		return sum(exprs-1) / size of exprs-1
-
-# Name: All potion effects of entity
-# Description: Returns a list with the active potion effects of an entity.
-# Usage: remove all active potion effects of player from player
-plural livingentity property [(all [[of] the]|the)] [active] potion[s] [effect[s]]:
-	loop of: potion
-	return type: potion effect types
-	get:
-		loop ...expr-1.getActivePotionEffects():
-			set {_r::%loop-value.getType()%} to loop-value.getType()
-		return {_r::*}
-	remove potion effect type:
-		remove change value from random entity of expr-1
-	delete:
-		remove (all active potion effects of expr-1) from random entity of expr-1
-	reset:
-		remove (all active potion effects of expr-1) from random entity of expr-1
-
-# Name: Duration of potion effect
-# Description: Returns the duration of a potion effect.
-# Usage: send "You have speed for %duration of speed of player%"
-livingentity property duration of %potion effect type%:
-	return type: timespan
-	get:
-		return try new Timespan(expr-1.getPotionEffect(expr-2).getDuration() * 50)
-
-# Name: Tier of potion effect
-# Description: Returns the amplifier of a potion effect.
-# Usage: send "You have speed of tier %tier of speed of player%"
-livingentity property (tier|amplifier) of %potion effect type%:
-	return type: integer
-	get:
-		return expr-1.getPotionEffect(expr-2).getAmplifier()
-
-# Name: Age
-# Description: Get or change the age of an entity.
-# Usage: set age of last spawned sheep to -10000
-livingentity property age:
-	return type: integer
-	get:
-		return try expr-1.getAge()
-	set number:
-		try expr-1.setAge(change value)
-	add number:
-		try expr-1.setAge((try expr-1.getAge()) + (change value))
-	remove number:
-		try expr-1.setAge((try expr-1.getAge()) - (change value))
-
-# Name: Split string every x characters
-# Description: Splits a string by every x characters.
-# Usage: set {_split::*} to "01029482094" split every 2 chars
-plural expression:
-	return type: strings
-	patterns:
-		%string% split [(by|at)] every %number% char[acter][s]
-		split %string% [(by|at)] every %number% char[acter][s]
-	get:
-		return expr-1 if expr-2 <= 0
-		return ...Splitter.fixedLength(expr-2).split(expr-1)
-
-# Name: Formatted numbers
-# Description: Formats the given numbers using a given decimal format.
-# Usage: send "Money: %formatted player's balance%"
-expression format[ted] %numbers% [(from|with|using) [decimal] format %-string%]:
-	return type: strings
-	get:
-		loop exprs-1:
-			add 1 to {_i}
-			set {_r::%{_i}%} to try new DecimalFormat(expr-2 ? "######,######.######").format(loop-expression)
-		return {_r::*}
+		return (sum(exprs-1) / size of exprs-1) if parser mark is 0, else (product(exprs-1) ^ (1 / (size of exprs-1)))
 
 # Name: Reversed strings
 # Description: Reverses the given strings.
-# Usage: broadcast "%reversed ""abcdef""%"
-expression (reverse|backwards) [(string|text)] %strings%:
-	return type: strings
+# Usage: broadcast backwards "abcdef"
+expression (reverse[d]|backwards) [(string|text)[s]] %$strings%:
+	return type: string
 	get:
 		loop exprs-1:
-			add 1 to {_i}
-			set {_r::%{_i}%} to try new StringBuilder(loop-expression.toString()).reverse().toString()
-		return {_r::*}
+			add 1 to {_index}
+			set {_value} to loop-value
+			set {_output::%{_index}%} to join (characters at (integers from (length of {_value}) to 1) of {_value})
+		return {_output::*}
 
-# Name: Rainbow string
-# Description: Returns a string colored differently every X characters.
-# Usage: broadcast rainbow "PARTY TIMEEEEE"
-# Note: Requires the 'Split string every x characters' expression.
-expression rainbow %string% [every %-int% char[acter]s] [[colo[u]red] [(with|by|from)] %-colors%]:
-	return type: string
-	get:
-		set {_c::*} to (exprs-3 ? (pink, gold, yellow, lime, light blue, indigo and purple))
-		set {_i} to 1
-		loop (split expr-1 every (expr-2 ? 1) characters):
-			set {_index} to {_index} + 1
-			if loop-value is " ":
-				set {_r::%{_index}%} to " "
-				continue
-			set {_r::%{_index}%} to "<%{_i}th element out of {_c::*}%>%loop-value%"
-			set {_i} to (1 + {_i} if {_i} < (size of {_c::*}), else 1)
-		return colored join {_r::*} 
-
-# Name: Border slots of inventory
-# Description: Returns the border slots of an inventory
-# Usage: set border of player's inventory to diamond
-# Credits: blue
-plural inventory property border [slots]:
-	return type: integers
-	get:
-		set {_r::*} to (integers between 0 and 8) and (integers between ((rows of expr-1) * 9) - 9 and ((rows of expr-1) * 9) - 1) if (rows of expr-1) > 2
-		loop integers from 1 to (rows of expr-1):
-			add (loop-value * 9) and (loop-value * 9 + 8) to {_r::*}
-		return {_r::*}
-	set itemtype:
-		set slots (border of expr-1) of expr-1 to (random item of change value)
-	delete:
-		set slots (border of expr-1) of expr-1 to air
-	reset:
-		set slots (border of expr-1) of expr-1 to air
-
-# Name: Ordinal number
-# Description: The ordinal value of a number.
-# Usage: send "You are the %ordinal of {pos::%player%}% person in the queue."
-integer property ordinal [value]:
-	return type: string
-	get:
-		return "%expr-1%%(((mod(expr-1, 10))th element out of (split ""st,nd,rd,th,th,th,th,th,th"" at "","") if expr-1 != 11, 12 or 13, else ""th"") ? ""th"") if expr-1 != 0, else """"%"
-
-# Name: Text from URL
-# Description: Returns the text from a URL.
-# Usage: send "Current version: %text from ""{@url}""%"
-plural expression [the] (text|content[s]) (of|from) [(url|link|[web]site)] %string%:
-	return type: strings
-	get:
-		set {_br} to try new BufferedReader(try new InputStreamReader(try new URL(expr-1).openStream()))
-		set {_r::*} to ...try {_br}.lines()
-		try {_br}.close()
-		return {_r::*}
-
-# Name: Horse color
-# Description: Returns the color of a horse.
-# Usage: set horse color of player's vehicle to black
-entity property horse colo[u]r:
-	return type: object
-	get:
-		return if expr-1 is not a horse
-		return HorseColor.values()[HorseColor.ordinal(expr-1.getColor())]
-	set object:
-		expr-1 is a horse
-		change value is instance of HorseColor
-		expr-1.setColor(change value)
-
-# Name: Horse style
-# Description: Returns the color of a horse.
-# Usage: set horse style of event-entity to none
-entity property horse style:
-	return type: object
-	get:
-		return if expr-1 is not a horse
-		return HorseStyle.values()[HorseStyle.ordinal(expr-1.getStyle())]
-	set object:
-		expr-1 is a horse
-		change value is instance of HorseStyle
-		expr-1.setStyle(change value)
-
-# Name: Statistic
-# Description: Returns the value of a statistic from a player.
-# Usage: send "Deaths: %statistic ""deaths"" of player%"
-plural player property statistic[s] [value[s]] %strings%:
-	return type: objects
-	get:
-		loop exprs-2:
-			set {_i} to {_i} + 1
-			set {_r::%{_i}%} to try expr-1.getStatistic(try Statistic.valueOf(loop-expression.toString().toUpperCase().replace(" " and "_")))
-		return {_r::*}
-
-# Name: Square corners
-# Description: Returns the corners of a square from its center and size.
-# Usage: set {_c::*} to corners of square from event-location and size 3
+# Name: String split every N characters
+# Description: Splits a string by every N characters.
+# Usage: send split arg-1 every 20 characters
 plural expression:
-	loop of: corner
-	return type: locations
 	patterns:
-		[the] corners of [a] square (at|from) [center] %location% [(with|and)] size %int%
-		[the] square corners (at|from) [center] %location% [(with|and)]] size %int%
-	get:
-		set {_l::*} to (((x-coord of expr-1) - (expr-2)), ((x-coord of expr-1) + (expr-2)), ((z-coord of expr-1) - (expr-2)) and ((z-coord of expr-1) + (expr-2)))
-		set {_c::*} to ((location at {_l::1}, (y-coord of expr-1), {_l::4} in (expr-1's world)), (location at {_l::1}, (y-coord of expr-1), {_l::3} in (expr-1's world)), (location at {_l::2}, (y-coord of expr-1), {_l::3} in (expr-1's world)) and (location at {_l::2}, (y-coord of expr-1), {_l::4} in (expr-1's world)))
-		return {_c::*}
-
-# Name: Expressible conditions
-# Description: Returns the result of a condition.
-# Usage: broadcast "YAY" if ((player is alive?) and ({hi} = {yay}?)) is (true and true)
-# Credits: Donut
-expression:
-	return type: boolean
-	patterns:
-		[if] <(.+)>?
-		check [if] <(.+)>
-		output (from|of) [[the] condition] <(.+)>
-		whether <(.+)>
-	parse:
-		set {_condition} to Condition.parse("%regex-1%" and "Can't understand this condition: %regex-1%")
-		continue if {_condition} is set
-	get:
-		return {_condition}.check(event)        
-
-# Name: Rounded numbers to N decimal places
-# Description: Rounds the given numbers to a certain amount of decimal places smaller 
-#              than or equal to the number accuracy option in config.
-# Usage: set {_rnd} to rounded {_xp} with 1 decimal place 
-expression [the] round[ed] %numbers% (at|with|by|to) %number% decimal[s] [place[s]]:
-	return type: numbers
-	get:
-		loop exprs-1:
-			add 1 to {_i}
-			set {_n} to loop-expression
-			set {_r::%{_i}%} to (round({_n} * 10^floor(expr-2))) / 10^floor(expr-2)
-		return {_r::*}
-
-# Name: Random UUID
-# Description: Returns a random UUID.
-# Usage: set {_} to random uuid
-expression [a] (random[i(z|s)ed]|new) uuid [(1¦without (dashes|hyphens))]:
-	return type: string
-	get:
-		return (UUID.randomUUID().toString() if parse mark != 1, else UUID.randomUUID().toString().replace("-" and "")) 
-
-# Name: Character at
-# Description: Get, set or delete the character at a certain index in a string.
-# Usage: set {_char} to char at 1 in message
-expression [the] char[acter] at [(index|position)] %number% in %string%:
-	return type: string
-	get:
-		return try expr-2.charAt((expr-1) - 1).toString()
-	set string:
-		set {_sb} to try new StringBuilder(expr-2)
-		try {_sb}.setCharAt((expr-1) - 1 and "%change value%")
-		set raw expr-2 to {_sb}.toString()
-	delete:
-		set {_sb} to try new StringBuilder(expr-2).deleteCharAt((expr-1) - 1)
-		set raw expr-2 to {_sb}.toString()
-
-# Name: Integers with base
-# Description: Returns the values of the given integers in a system with radix N.
-# Usage: set {_binary} to 10924 to base 2
-expression %integers% (in|to|using|with) (base|radix) %number%:
+		%string% split [(by|at)] every %number% char[acter][s]
+		split %string% [(by|at)] every %number% char[acter][s]
 	return type: strings
 	get:
-		loop exprs-1:
-			set {_i} to {_i} + 1
-			set {_n} to loop-expression
-			set {_r::%{_i}%} to try JavaInteger.toString({_n} and expr-2)
-		return {_r::*}
-
-# Name: Random string
-# Description: Returns a random string with a specified length.
-#              The string can be alphabetic, alphanumeric, numeric or ascii.
-# Usage: set {code::%player%} to random alphanumeric string of length 16
-expression random [(alphabetic[al]|1¦alphanumeric[al]|2¦ascii|3¦numeric)] [(string|text)] (of|with) length %number%:
-	return type: string
-	get:
-		return RandomStringUtils.randomAlphanumeric(expr-1) if parse mark = 1
-		return RandomStringUtils.randomAscii(expr-1) if parse mark = 2
-		return RandomStringUtils.randomNumeric(expr-1) if parse mark = 3
-		return RandomStringUtils.randomAlphabetic(expr-1)
-
-# Name: Midnight
-# Description: Returns the date of midnight.
-# Usage: set {_midnight} to midnight
-expression midnight:
-	return type: date
-	get:
-		set {_c} to Calendar.getInstance()
-		return date(({_c}.get(Calendar.YEAR)), ({_c}.get(Calendar.MONTH) + 1), ({_c}.get(Calendar.DAY_OF_MONTH) + 1), 0, 0, 0, 0)
-
-# Name: Regex split
-# Description: Splits a string by a regex.
-# Usage: set {_i} to regex split {info} at "\d{5}"
-plural expression:
-	return type: strings
-	patterns:
-		regex split %string% (at|by|using) [[the] pattern] %string%
-		%string% regex split (at|by|using) [[the] pattern] %string%
-	get:
-		return ...try expr-1.split(expr-2)
-
-# Name: Protocol version
-# Description: Gets the protocol version of a player. (https://wiki.vg/Protocol_version_numbers)
-# Usage: kick player due to "Nope..." if protocol version of player <= 578
-# Note: Requires ProtocolLib
-player property protocol version:
-	return type: integer
-	get:
-		return expr-1.getProtocolVersion()
-
-# Name: Regex matcher
-# Description: Gets the Matcher object that can be used to get capturing groups.
-# Usage: set {_matcher} to macther of "(\d)" in message
-expression [the] [regex] matcher of [pattern] %string% (in|for) %string%:
-	return type: object
-	get:
-		return try RegexPattern.compile(expr-1).matcher(expr-2)
-
-# Name: Capturing group
-# Description: Gets a capturing group from a Matcher object.
-# Usage: set {_groupOne} to regex group 1 of {_matcher}
-expression [the] [regex] [(captur(e|ing)|matching)] group %number% of %object%:
-	return type: string
-	get:
-		expr-2 is instance of Matcher
-		expr-2.reset()
-		expr-2.find() is true
-		return try expr-2.group(expr-1) 
-
-# Name: Glowing item
-# Description: Returns a glowing version of an item.
-# Usage: give player shiny wooden axe
-expression [a] (glowing|shiny) %item/itemtype%:
-	return type: itemtype
-	get:
-		set {_r} to expr-1
-		set {_meta} to {_r}.getItemMeta() 
-		{_meta}.addItemFlags([ItemFlag.HIDE_ENCHANTS])
-		{_r}.setItemMeta({_meta})
-		enchant {_r} with (lure 1 if expr-1 is not a fishing rod, else infinity 1)
-		return {_r}
-
-# Name: Direction of location
-# Description: Set or get the direction of a location. 
-# Usage: set direction of {_location} to vector from {_target} -- vector from player
-location property direction:
-	return type: direction
-	get:
-		return new Direction(expr-1.getDirection())
-	set vector:
-		expr-1.setDirection(change value)
-
-# Name: Roman numeral
-# Description: Get the roman numeral of an integer.
-# Usage: send "Sharpness level: %roman numeral of (level of sharpness of player's tool)%"
-# Credits: EWS
-integer property roman numeral:
-	return type: string
-	get:
-		set {_n} to expr-1
-		set {_roman::*} to split "M|CM|D|CD|C|XC|L|XL|X|IX|V|IV|I" at "|"
-		loop 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4 and 1:
-			add 1 to {_i}
-			while {_n} >= loop-value:
-				add 1 to {_next}
-				remove loop-value from {_n}
-				set {_r} to "%{_r} ? """"%%{_roman::%{_i}%}%"
-		return {_r} ? "0"
-
-# Name: Formatted timespan
-# Description: Returns a formatted timespan.
-# Usage: send "Time played: %(time played of player) formatted ""dd days hh hours mm minutes and ss seconds""%"
-expression %timespan% (with format|formatted [as]) %string%:
-	return type: string
-	get:
-		set {_v::seconds} to expr-1.getMilliSeconds() / 1000
-		set {_format} to expr-2
-		set {_m::*} to 86400, 3600 and 60
-		set {_n::*} to "days", "hours" and "minutes"
-		loop {_n::*}:
-			set {_v::%loop-value%} to floor({_v::seconds} / {_m::%loop-index%})
-			set {_v::seconds} to round({_v::seconds} - ({_v::%loop-value%} * {_m::%loop-index%}))
-		loop {_v::*}:
-			replace all "%first character of loop-index%%first character of loop-index%" with "%loop-value%" in {_format}
-		return {_format}
-
-# Name: Compacted number
-# Description: Returns the compacted version of a number.
-# Usage: send "Balance: %compacted (player's balance)%"
-expression compact[ed] %number%:
-	return type: string
-	get:
-		return "%expr-1%" if expr-1 < 1000
-		set {_s::*} to split "k|M|B|T|Qd|Qi|Sx|Sp|O|N|Dc|U|Du" at "|"
-		set {_s} to {_s::%floor(log(expr-1) / 3)%} 
-		return "%expr-1 / (1000^floor(log(expr-1) /3) if {_s} is set, else 1000^(size of {_s::*}))%%{_s} ? last element of {_s::*}%"
-
-# Name: Decompacted number
-# Description: Returns the decompacted version of a compacted number.
-# Usage: set {_ac} to decompacted {_input}
-expression (un|de)compact[ed] %string%:
-	return type: number
-	get:
-		loop split "k|M|B|T|Qd|Qi|Sx|Sp|O|N|Dc|U|Du" at "|":
-			add 1 to {_i}
-			set {_p} to 1000^{_i}
-			expr-1 ends with loop-value
-			exit loop 
-		return ((substring of expr-1 from indices 1 to (length of expr-1)-1) parsed as number) * {_p}
-
-# Name: Factorial
-# Description: Returns the factorial of an integer.
-# Usage: set {_combinations} to factorial {elements}
-expression:
-	return type: integer
-	patterns:
-		factorial [of] %integer%
-		%integer%(!| factorial)
-	get:
-		return (product(all integers from 1 to expr-1) if expr-1 is not 0, else 1)
-
-# Name: Trimmed string
-# Description: Removes excess spaces from a string.
-# Usage: set message to trimmed message
-expression trim[med] %string%:
-	return type: string
-	get:
-		return try expr-1.replaceAll("\s{2,}" and " ").replaceAll("^\s*" and "").replaceAll("\s*$" and "")
-
-# Name: English plural
-# Description: Returns the English plural of a word.
-# Usage: set {_} to english plural of arg-1
-# Note: Can be inaccurate.
-string property [english] plural:
-	return type: string
-	get:
-		return Utils.toEnglishPlural(expr-1)
-
-# Name: Entity ID
-# Description: Returns the entity id of the given entities.
-# Usage: set int field 0 of {_packet} to entity id of {_t}
-entities property e[ntity][ ]id[entifier][s]:
-	return type: integers
-	get:
-		loop exprs-1:
-			set {_eid} to loop-expression.getEntityId()
-			set {_r::%{_eid}%} to {_eid}
-		return {_r::*}
-
-# Name: Pixel width 
-# Description: Returns the pixel width of a given string.
-# Usage: set {_px} to pixel width of {_input}
-string property pixel (width|size|length):
-	return type: integer
-	get:
-		return new MinecraftFont().getWidth(expr-1)
-
-# Name: Direction from two locations
-# Description: Returns the direction from a location to another.
-# Usage: push player (direction from player to targeted entity of player) at speed 10
-expression [the] direction from %location% to %location%:
-	return type: direction
-	get:
-		return try new Direction(vector from expr-2 to expr-1)
-
-# Name: Dyed item
-# Description: Returns a dyed version of an item.
-# Usage: give player leather helmet colored rgb(20, 20, 90)
-expression %item/itemtype% (colo[u]red|dyed|painted) %color%:
-	return type: item
-	get:
-		set {_r} to expr-1
-		dye {_r} expr-2
-		return {_r}
-
-# Name: Moon phase
-# Description: Returns the moon phase in a world.
-# Usage: broadcast "%moon phase in player's world%"
-expression [the] moon phase (of|in) [[the] world] %world%:
-	return type: string
-	get:
-		set {_phase} to mod(floor(expr-1.getFullTime() / 24000), 8) + 1
-		set {_phases::*} to split "full moon|waning gibbous|third quarter|waning crescent|new moon|waxing crescent|first quarter|waxing gibbous" at "|"
-		return {_phases::%{_phase}%}
-
-# Name: Collar color
-# Description: Get or set the collar color of an entity (wolf/cat).
-# Usage: set collar color of (player's targeted entity) to red
-livingentity property collar colo[u]r:
-	return type: color
-	get:
-		return if expr-1 is not a wolf or a cat
-		return SkriptColor.fromDyeColor(expr-1.getCollarColor())
-	set color:
-		expr-1 is a wolf or a cat
-		expr-1.setCollarColor((change value).asDyeColor())
-
-# Name: Item frame rotation
-# Description: Get or set the rotation of an item frame.
-# Usage: set rotation of {_if} to flipped
-entity property rotation:
-	return type: object
-	get:
-		return if expr-1 is not an item frame
-		return Rotation.values()[Rotation.ordinal(expr-1.getRotation())]
-	set object:
-		expr-1 is an item frame
-		change value is instance of Rotation
-		expr-1.setRotation(change value)
-
-# Name: Server operators
-# Description: Returns the all of the opped players on the server.
-# Usage: loop all operators:
-plural expression [(all [[of] the]|the)] (op[ped] players|op[erator]s):
-	loop of: player
-	return type: offline players
-	get:
-		return ...server.getServer().getOperators()
-
-# Name: Banned players
-# Description: Returns all of the banned players on the server.
-# Usage: broadcast "%banned players%"
-plural expression [(all [[of] the]|the)] banned players:
-	loop of: player
-	return type: offline players
-	get:
-		return ...server.getServer().getBannedPlayers()
-
-# Name: Maximum age
-# Description: Returns the maximum age of a block.
-# Usage: set {_tG} to maximum age of {_b}
-block property max[imum] age:
-	return type: integer
-	get:
-		return if try expr-1.getBlockData() is not instance of BlockDataAgeable
-		return expr-1.getBlockData().getMaximumAge()
-
-# Name: Item with item flags
-# Description: Returns an item with the given itemflags.
-# Usage: set {_i} to diamond sword with flags "hide attributes"
-expression %item/itemtype% with [item[ ]]flag[s] %objects%:
-	return type: item
-	get:
-		set {_r} to expr-1
-		set {_m} to {_r}.getItemMeta()
-		loop exprs-2:
-			loop-expression is instance of ItemFlag
-			{_m}.addItemFlags([loop-expression])
-		{_r}.setItemMeta({_m})
-		return {_r}
-
-# Name: Item flags of item
-# Description: Returns a list with the item flags of an item.
-# Usage: set {_flags::*} to item flags of player's tool
-plural object property [item[ ]]flag[s]:
-	return type: objects
-	get:
-		return ...(random item of expr-1).getItemMeta().getItemFlags()
-
-# Name: Progress bar
-# Description: Creates a progress bar of a given length from the total and current values.
-# Usage: send progress bar of size 10 from (player's balance) to {rankup::prices::%{_nextRank}%} using the character "|" and colors yellow and pink
-expression [a] progress bar of (size|length) %integer% from %number% to %number% (using|with) [[the] char[acter][s]] %string% [[[and [the]] colo[u]rs %-color%[( and|,[ ])]%-color%]:
-	return type: string
-	get:
-		loop expr-1 times:
-			set {_bar} to "%{_bar} ? """"%%expr-4%"
-		set {_c} to (expr-2 / expr-3) * expr-1 * (length of expr-4)
-		return ("<%expr-5 ? lime%>%(subtext of {_bar} from indices 1 to {_c}) ? """"%<%expr-6 ? light gray%>%(subtext of {_bar} from indices {_c} + 1 to (length of {_bar})) ? """"%")
+		return expr-1 if expr-2 < 0, else (regex split expr-1 by "(?<=\G.{%expr-2%})(?!$)")
 
 # Name: Soundex value
-# Description: Returns the soundex value of a string.
+# Description: Returns the soundex value of a string. (See: https://en.wikipedia.org/wiki/Soundex)
 # Usage: send "Use `command` not `%arg-1%`" if soundex value of "command" is soundex value of arg-1
 string property soundex [value]:
 	return type: string
 	get:
-		return new Soundex().encode(expr-1)
-
-# Name: Centered string
-# Description: Returns the string and spaces to make it centered.
-# Usage: send centered "ooooooo hiiii"
-# Note: Can be slightly inaccurate.
-#       Bold color codes will mess up the centering.
-expression center[ed] %string% [(with|from) [a] size [of] %-integer%]:
-	return type: string
-	get:
-		set {_total} to (expr-2 ? 323)
-		set {_center} to floor({_totalSize} / 2)
-		set {_inputpx} to pixel length of uncolored expr-1
-		set {_remainingpx} to {_total} - {_inputpx}
-		set {_tospacepx} to floor({_remainingpx} / 2)
-		while ({_spacedpx} ? 0) < {_tospacepx}:
-			set {_r} to "%{_r} ? """"% "
-			set {_spacedpx} to {_spacedpx} + (pixel width of " ") + 2 - (1 if {_i} is not set, else 0)
-			set {_i} to {_i} + 1
-		return "%{_r} ? """"%%expr-1%"
-
-# Name: Nth root
-# Description: Returns the Nth root of a number.
-# Usage: send "%cube root of 125%"
-# Note: Can be inaccurate when dealing with high numbers.
-#       Does not work with negative numbers.
-number property (%-number%(st|nd|rd|th)|2¦square|3¦cube) root:
-	return type: number
-	get:
-		return 0 if expr-1 < 0
-		return expr-1 ^ (1 / (expr-2 ? parse mark))
-
-# Name: Absorption hearts
-# Description: Get or set the absorption hearts of an entity.
-# Usage: set player's absorption hearts to 1
-living entity property absorption (heart[s]|amount|points):
-	return type: number
-	get:
-		return expr-1.getAbsorptionAmount() / 2
-	set number:
-		try expr-1.setAbsorptionAmount((change value) * 2)
-	add number:
-		try expr-1.setAbsorptionAmount((expr-1.getAbsorptionAmount()) + ((change value) * 2))
-	remove number:
-		try expr-1.setAbsorptionAmount((expr-1.getAbsorptionAmount()) - ((change value) * 2))
-	delete:
-		expr-1.setAbsorptionAmount(0)
-
-# Name: World border center
-# Description: Get or set the center of the world border of a world.
-# Usage: set world border center of event-world to player
-world property world[(-| )]border (center|middle):
-	return type: location
-	get:
-		return expr-1.getWorldBorder().getCenter()
-	set location:
-		expr-1.getWorldBorder().setCenter(change value)
-
-# Name: World border size
-# Description: Get or change the size of the world border of a world.
-# Usage: remove 1 from worldborder size of event-world
-world property world[(-| )]border size:
-	return type: number
-	get:
-		return expr-1.getWorldBorder().getSize()
-	set number:
-		expr-1.getWorldBorder().setSize(change value)
-	add number:
-		expr-1.getWorldBorder().setSize((expr-1.getWorldBorder().getSize()) + change value)
-	remove number:
-		expr-1.getWorldBorder().setSize((expr-1.getWorldBorder().getSize()) - change value)
-
-# Name: Elements of
-# Description: Returns first, last or random Nth elements of a list.
-# Usage: set {_topThree} to the first 3 elements of {top::*}
-plural expression:
-	return type: objects
-	patterns:
-		([the] first|1¦[the] last) %integer% elements ([out] of|from) %objects%
-		%integer% (2¦random) elements [out] of %objects%
-	get:
-		set {_e::*} to ((reversed exprs-2) if parse mark = 1, else exprs-2)
-		set {_e::*} to shuffled {_e::*} if parse mark = 2
-		loop expr-1 times:
-			set {_r::%loop-number%} to {_e::%loop-number%}
-		return {_r::*}
-
-# Name: Stored enchantments
-# Description: Returns the stored enchantments in a book.
-# Usage: set {_ench::*} to stored enchantments of player's tool
-plural itemtype property stored enchant(s|ments):
-	return type: enchantment types
-	get:
-		set {_meta} to try (random item of expr-1).getItemMeta()
-		loop ...try {_meta}.getStoredEnchants().entrySet():
-			set {_e::%loop-value.getKey()%} to try new EnchantmentType(loop-value.getKey() and loop-value.getValue())
-		return {_e::*}
-	add enchantment type:
-		set {_meta} to try (random item of expr-1).getItemMeta()
-		try {_meta}.getStoredEnchants() is set
-		{_meta}.addStoredEnchant((change value).getType(), (change value).getLevel(), true)
-		expr-1.setItemMeta({_meta})
-	remove enchantment:
-		set {_meta} to try (random item of expr-1).getItemMeta()
-		try {_meta}.getStoredEnchants() is set
-		{_meta}.removeStoredEnchant(change value)
-		expr-1.setItemMeta({_meta})
-	delete:
-		expr-1.setItemMeta((random item of enchanted book).getItemMeta())
-
-# Name: Health scale
-# Description: Get or set the health scale of a player.
-# Usage: set health scale of player to 3
-player property health scale:
-	return type: number
-	get:
-		return expr-1.getHealthScale()
-	set number:
-		try expr-1.setHealthScale(change value)
-
-# Name: Spectator target
-# Description: Get or set the entity that a player is spectating.
-# Usage: send "Target: %spectator target of player%"
-player property spectat(or|ing) (entity|target):
-	return type: entity
-	get:
-		return try expr-1.getSpectatorTarget()
-	set entity:
-		try expr-1.setSpectatorTarget(change value)
-
-# Name: Pickup capability
-# Description: Whether an entity can or cannot pickup items.
-# Usage: set pickup capability of player to false
-livingentity property pick[ ]up (state|[cap]ability):
-	return type: boolean
-	get:
-		return expr-1.getCanPickupItems()
-	set boolean:
-		expr-1.setCanPickupItems(change value)
-
-# Name: Sorted list with custom output
-# Description: Sorts a list with a custom output.
-# Usage: set {_top10} to the highest 10 values of {kills::*} formatted as "[] @index has @value kills []"
-# Note: Requires the `Elements of` expression.
-plural expression [the] (1¦(highest|top|greatest)|(lowest|smallest)) %integer% (values|elements|objects) [out] of %~objects% (with format|formatted [as]) %string%:
-	return type: strings
-	get:
-		loop ...Variables.getVariable((raw expr-2).getName().toString(event), event and (raw expr-2).isLocal()).entrySet():
-			add 1 to {_i}
-			set {_sort::%loop-value.getValue()%.%{_i}%} to expr-3.replace("@index" and "%loop-value.getKey()%").replace("@value" and "%loop-value.getValue()%")
-		if expr-3 contains "@place":
-			set {_in} to (1 if parse mark != 1, else -1)
-			set {_p} to (size of {_sort::*} if parse mark = 1, else 1)
-			loop {_sort::*}:
-				set {_sort::%loop-index%} to loop-value.replace("@place" and "%{_p}%")
-				add {_in} to {_p}
-		return the first expr-1 elements of ((reversed {_sort::*}) if parse mark = 1, else {_sort::*})
-
-# Name: Painting art
-# Description: Get or set the displayed image in a painting.
-# Usage: set art of {_painting} to sunset
-entity property (art|picture|image):
-	return type: object
-	get:
-		return if expr-1 is not a painting 
-		return Art.values()[Art.ordinal(expr-1.getArt())]
-	set object:
-		expr-1 is a painting
-		change value is instance of Art
-		expr-1.setArt(change value and true)
-
-# Name: Water level
-# Description: Get or change the water level of a cauldron.
-# Usage: set player's targeted block's stored water level to 3
-block property [(contained|deposited|stored)] (water|fluid|liquid) level:
-	return type: integer
-	get:
-		return if try expr-1.getBlockData() is not instance of Levelled
-		return expr-1.getBlockData().getLevel() 
-	set number:
-		try expr-1.getBlockData() is instance of Levelled
-		set {_b} to expr-1.getBlockData()
-		{_b}.setLevel(change value)
-		expr-1.setBlockData({_b})
-	add number:
-		try expr-1.getBlockData() is instance of Levelled
-		set {_b} to expr-1.getBlockData()
-		try {_b}.setLevel(expr-1.getBlockData().getLevel() + (change value))
-		expr-1.setBlockData({_b})
-	remove number:
-		try expr-1.getBlockData() is instance of Levelled
-		set {_b} to expr-1.getBlockData()
-		try {_b}.setLevel((expr-1.getBlockData().getLevel()) - (change value))
-		expr-1.setBlockData({_b})
-	reset:
-		try expr-1.getBlockData() is instance of Levelled
-		set {_b} to expr-1.getBlockData()
-		{_b}.setLevel(0)
-		expr-1.setBlockData({_b})
+		return "" if expr-1 ? "" is empty
+		set {_input} to capitalized expr-1
+		set {_output} to first character of {_input}
+		loop characters at (integers from 2 to (length of {_input} + 1)) in {_input}:
+			return {_output} if length of {_output} >= 4  
+			set {_digit} to character at (index of loop-value in "ABCDEFGHIJKLMNOPQRSTUVWXYZ") in "01230120022455012623010202"
+			{_digit} is not "0" or last character of {_output}
+			set {_output} to join {_output} and {_digit}
+		loop 4 - length of {_output} times:
+			set {_output} to join {_output} and "0"
+		return {_output}
 
 # Name: Number of occurrences
-# Description: Returns the number of occurrences of a string in a string.
-# Usage: set {_i} to number of occurrences of "E" in {list::*}
-expression [the] [number of] (occurrences|repetitions) of %string% in %strings%:
-	return type: integer
+# Description: Returns the number of occurrences of a certain sequence in a string.
+# Usage: set {_i} to number of occurrences of "E" in player's message
+expression [the] [(number|amount) of] (occurrences|repetitions) of %string% in %$strings%:
+	return type: number
 	get:
 		loop exprs-2:
-			add ((size of split "%loop-expression%" at expr-1) - 1) to {_r}
-		return {_r}
+			add size of (split "%loop-value%" by "%expr-1%") - 1 to {_output}
+		return {_output}
 
-# Name: All commands
-# Description: Gets a list of all the commands on the server.
-# Usage: set {_c::*} to all commands
-plural expression [(all [[of] the]|the)] commands:
-	return type: strings
-	get: 
-		loop ...server.getServer().getCommandMap().getCommands():
-			set {_r::%loop-value%} to loop-value.getName()
-		return {_r::*}
-
-# Name: Inventory size
-# Description: Returns the amount of slots an inventory has.
-# Usage: set slot (inv size of player's inventory) to dirt named "The End!"
-inventory property inv[entory] size:
-	return type: integer
-	get:
-		return expr-1.getSize()
-
-# Name: Random weighted element
-# Description: Returns a random element from a list using the given chances.
-# Usage: give player random weighted object of {_loot::*} using the chances {_weights::*}
-expression [a] random [weighted] (value|object|element) [out] of %objects% (using|with) [the] (chance|weight)s %numbers%:
-	return type: object
-	get:
-		set {_r} to random number between 0 and sum(exprs-2)
-		loop size of exprs-2 times:
-			add (loop-number)th element of exprs-2 to {_c}
-			return (loop-number)th element of exprs-1 if {_c} >= {_r}
-
-# Name: Block sounds
-# Description: Returns a specific sound of a block.
-# Usage: set {_sound} to break sound of player's targeted block
-# Note: Requires Paper
-block property (break|1¦fall|2¦hit|3¦place|4¦(step|walk)) sound:
+# Name: Parsed expressions
+# Description: Returns the given strings with expressions parsed.
+#              For instance, inputting "hello %%{var}%%" will replace "%%{var}%%" with the actual value.
+# Usage: set {_message} to parse expressions in message
+expression:
+	patterns:
+		parsed (expressions|var[iable]s) in %$strings%
+		%$strings% with (expressions|var[iable]s) parsed
 	return type: string
 	parse:
-		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
-		Skript.error("The 'block sounds' expression is not supported on this server software")
+		set {_blockingLogHandler} to new BlockingLogHandler()
+		continue
 	get:
-		return expr-1.getSoundGroup().getFallSound().toString() if parse mark = 1
-		return expr-1.getSoundGroup().getHitSound().toString() if parse mark = 2
-		return expr-1.getSoundGroup().getPlaceSound().toString() if parse mark = 3
-		return expr-1.getSoundGroup().getStepSound().toString() if parse mark = 4
-		return expr-1.getSoundGroup().getBreakSound().toString()
+		# Start a blocking log handler to block errors from invalid expressions
+		set {_logHandler} to SkriptLogger.startLogHandler({_blockingLogHandler})
+		loop exprs-1:
+			add 1 to {_index}
+			set {_output::%{_index}%} to VariableString.newInstance(loop-value).toString(event)
+		set {_} to {_logHandler}.stop()
+		return {_output::*}
 
-# Name: Login result
-# Description: Returns the result of a login event.
-# Usage: if login result is kick full:
-expression [the] [event-][(login|connect)] result:
-	return type: object
+# Name: Formatted numbers
+# Description: Formats the given numbers using a given decimal format.
+#              The format is constructed at parse time, therefore it must be a string literal.
+# Usage: send "Money: %formatted player's balance%"
+expression:
+	patterns:
+		formatted %$numbers% (from|with|using|as) [[decimal] format] %string%
+		%$numbers% formatted (from|with|using|as) [[decimal] format] %string%
+	return type: strings
 	parse:
-		continue if ScriptLoader.isCurrentEvent(class "org.bukkit.event.player.PlayerLoginEvent") = true    
-		Skript.error("Cannot use 'login result' outside of the connect event" and ErrorQuality.SEMANTIC_ERROR)
+		if expr-2 is not instance of VariableString:
+			Skript.error("The decimal format must be a string literal.")
+			stop
+		else if expr-2.isSimple() is false:
+			Skript.error("The decimal format must be a string literal.")
+			stop
+		set {_decimalFormat} to try new DecimalFormat(expr-2.getSingle(null))
+		continue if {_decimalFormat} is set
+		Skript.error("Invalid decimal format: %expr-2%")
 	get:
-		return LoginResult.values()[LoginResult.ordinal(event.getResult())]
-	set object:
-		change value is instance of LoginResult
-		event.setResult(change value)
+		loop exprs-1:
+			add 1 to {_index}
+			set {_output::%{_index}%} to {_decimalFormat}.format(loop-value)
+		return {_output::*}
 
-# Name: Breedability
-# Description: Get or set the breedability of an entity.
-# Usage: set breedability of event-entity to true
-livingentity property breed(ability|ing [cap]ability):
-	return type: boolean
+# Name: Ordinal number
+# Description: Ordinal numerals represent the position in a sequential order (e.g. 1st, 2nd, 3rd, etc.)
+# Usage: send "You are the %ordinal of {pos::%player%}% person in the queue."
+number property ordinal [(numeral|number|value)]:
+	return type: string
+	parse:
+		set {_suffixes::*} to "st", "nd", "rd", "th", "th", "th", "th", "th", "th" 
+		continue
 	get:
-		return try expr-1.canBreed()
-	set boolean:
-		try expr-1.setBreed(change value)
+		return "%expr-1%%{_suffixes::%mod(expr-1, 10) if expr-1 is not 11, 12 or 13, else 0%} ? "th"%"
+
+# Name: Roman numeral
+# Description: Returns the roman numeral of a number
+# Usage: send "Sharpness level: %roman numeral of (level of sharpness of player's tool)%"
+number property roman numeral:
+	return type: string
+	parse:
+		set {_roman::*} to "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV" and "I"
+		set {_arab::*} to 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4 and 1
+		continue
+	get:
+		set {_number} to expr-1
+		loop {_arab::*}:
+			loop {_number} / loop-value times:
+				set {_output} to join {_output} and {_roman::%loop-index-1%}
+				subtract loop-value-1 from {_number}
+		return {_output}
+
+# Name: Arabic numeral
+# Description: Converts a roman numeral back to an integer.
+# Usage: set {_level} to arabic numeral of message
+string property arab[ic] numeral:
+	return type: number
+	parse:
+		set {_roman::*} to "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV" and "I"
+		set {_arab::*} to 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4 and 1
+		continue
+	get:
+		set {_numeral} to expr-1
+		loop {_roman::*}:
+			while {_numeral} starts with loop-value:
+				add {_arab::%loop-index%} to {_output}
+				set {_remainingCharacters} to (length of {_numeral}) - (length of loop-value)
+				if {_remainingCharacters} is not 0:
+					set {_numeral} to last {_remainingCharacters} characters of {_numeral}
+				else:
+					delete {_numeral}
+		return {_output}
+
+# Name: Rounded numbers
+# Description: Rounds the given numbers to a certain amount of decimal places (smaller
+#              than or equal to the number accuracy option in config), or to the nearest multiple of a number.
+# Usage: set {_rnd} to rounded {_xp} to 1 decimal place
+expression:
+	patterns:
+		[the] rounded %$numbers% (at|with|by|to) %number% decimal[s] [place[s]]
+		[the] rounded %$numbers% to [the] nearest [multiple] of %number%
+	return type: numbers
+	get:
+		set {_precision} to (10 ^ (rounded down -1 * expr-2)) if pattern is 1, else expr-2
+		loop exprs-1:
+			add 1 to {_index}
+			set {_number} to loop-value
+			set {_output::%{_index}%} to (rounded ({_number} / {_precision})) * {_precision}
+		return {_output::*}
+
+# Name: Factorial
+# Description: Returns the factorial value of an integer.
+# Usage: set {_combinations} to factorial {elements}
+expression:
+	return type: number
+	patterns:
+		factorial [value] [of] %$numbers%
+		%$numbers%['[s]] factorial [value]
+		%number%!
+	get:
+		return product(all integers from 1 to expr-1) if expr-1 is not 0, else 1
+
+# Name: Protocol version
+# Description: Gets the protocol version of a client. (See: https://wiki.vg/Protocol_version_numbers)
+# Usage: kick player due to "Nope..." if protocol version of player <= 578
+# Note: Requires Paper
+player property protocol version:
+	return type: number
+	get:
+		return expr-1.getProtocolVersion()
+
+# Name: Client brand name
+# Description: Returns a player's client brand name. If the client didn't send this information, the brand name will not be set.
+#              For the Notchian client this name defaults to 'vanilla'. Some modified clients report other names such as forge.
+#              Do note that not all modified clients have a custom brand name.
+# Usage: kick player due to "Nope..." if player's client brand name is not "vanilla"
+# Note: Requires Paper
+player property [client] brand [name]:
+	return type: string
+	get:
+		return expr-1.getClientBrandName()
+
+# Name: Glowing item
+# Description: Returns a glowing version of an item.
+# Usage: give player shiny wooden axe
+expression [a] (glowing|shiny) %$itemtypes%:
+	return type: itemtypes
+	get:
+		loop exprs-1:
+			add 1 to {_index}
+			set {_output::%{_index}%} to loop-value
+			continue if enchantments of {_output::%{_index}%} exist	
+			enchant {_output::%{_index}%} with (lure if loop-value is not a fishing rod, else infinity)
+			set {_meta} to {_output::%{_index}%}.getItemMeta()
+			set {_} to {_meta}.addItemFlags([ItemFlag.HIDE_ENCHANTS])
+			set {_} to {_output::%{_index}%}.setItemMeta({_meta})
+		return {_output::*}
+
+# Name: Dyed item
+# Description: Returns a dyed version of an item.
+# Usage: give player leather helmet colored rgb(20, 20, 90)
+expression %$itemtypes% (colo[u]red|dyed|painted) %color%:
+	return type: itemtypes
+	get:
+		loop exprs-1:
+			add 1 to {_index}
+			set {_output::%{_index}%} to loop-value
+			dye {_output::%{_index}%} expr-2
+		return {_output::*}
 
 # Name: Time until
 # Description: Returns the time until a given date.
@@ -1222,1152 +317,5 @@ livingentity property breed(ability|ing [cap]ability):
 expression time until %date%:
 	return type: timespan
 	get:
-		return try new Timespan(((unix timestamp of expr-1) - (unix timestamp of now)) * 1000)
-
-# Name: Last attacker
-# Description: Returns the last attacker of an entity.
-# Usage: give 10 diamonds to last attacker of victim
-entity property last (attacker|damager):
-	return type: entity/block
-	get:
-		return expr-1.getLastDamageCause().getDamager()
-
-# Name: Time lived
-# Description: Get or set the time lived of an entity.
-# Usage: give player 100 stone if time lived of player = 20 seconds
-entity property time lived:
-	return type: timespan
-	get:
-		return try new Timespan(expr-1.getTicksLived() * 50)
-	set timespan:
-		expr-1.setTicksLived((change value).getTicks_i())
-
-# Name: Item cooldown
-# Description: Get or change the cooldown of a player for a certain item.
-# Usage: set player's cooldown for tool to 1 second
-player property cooldown for %item/itemtype%:
-	return type: timespan
-	get:
-		return try new Timespan(expr-1.getCooldown((random item of expr-2).getType()))
-	set timespan:
-		expr-1.setCooldown((random item of expr-2).getType(), (change value).getTicks_i())
-
-# Name: Time slept
-# Description: Gets the time slept of a player. Resets on wake up.
-# Usage: send "%time slept of player-arg%"
-player property (sleep[ing] time|time slept):
-	return type: timespan
-	get:
-		return try new Timespan(expr-1.getSleepTicks() * 50)
-
-# Name: Attack cooldown
-# Description: Gets the current cooldown for a player's attack. This is used to calculate damage, 
-#              with 1.0 representing a fully charged attack and 0.0 representing a non-charged attack
-# Usage: cancel event if attack cooldown of damager < 0.4
-player property attack cooldown:
-	return type: number
-	get:
-		return expr-1.getAttackCooldown()
-
-# Name: Active raids 
-# Description: Gets a list of the active raids in a world.
-# Usage: set {_raid} to first element of raids of player's world
-plural world property [active] raids:
-	return type: objects
-	get:
-		return ...expr-1.getRaids()
-
-# Name: Active time of raid
-# Description: Gets the time a raid has been active for.
-# Usage: set {_time} to active time of {_raid}
-object property active time:
-	return type: timespan
-	get:
-		return if expr-1 is not instance of Raid
-		return try new Timespan(expr-1.getActiveTicks() * 50)
-
-# Name: Bad omen level
-# Description: Gets the bad omen level of a raid.
-# Usage: broadcast "Ooop" if bad omen level of {_raid} > 2
-object property bad omen level:
-	return type: integer
-	get:
-		return if expr-1 is not instance of Raid
-		return expr-1.getBadOmenLevel()
-	set number:
-		expr-1 is instance of Raid
-		try expr-1.setBadOmenLevel(change value)
-
-# Name: Raid location
-# Description: Gets the location of a raid.
-# Usage: spawn 1 iron golem at raid location of {_raid}
-object property ([village] raid[ing] location|location of [village] raid):
-	return type: location
-	get:
-		return if expr-1 is not instance of Raid
-		return expr-1.getLocation()
-
-# Name: Raid heroes
-# Description: Gets a list of the heroes of a raid.
-# Usage: give heroes of {_raid} 1 diamond sword
-plural object property heroes:
-	return type: players
-	get:
-		return if expr-1 is not instance of Raid
-		loop ...expr-1.getHeroes():
-			set {_r::%loop-value%} to "%loop-value%" parsed as player
-		return {_r::*}
-
-# Name: Raiders
-# Description: Gets a list of a raid's raiders.
-# Usage: set {_raiders::*} to raiders of {_raid}
-plural object property raiders:
-	return type: living entities
-	get:
-		return if expr-1 is not instance of Raid
-		return ...expr-1.getRaiders()
-
-# Name: Raid status
-# Description: Gets the status of a raid.
-# Usage: broadcast "yayyyayayay" if status of {_raid} is victory
-object property [raid] status:
-	return type: object
-	get:
-		return if expr-1 is not instance of Raid
-		return RaidStatus.values()[RaidStatus.ordinal(expr-1.getStatus())]
-
-# Name: Raid groups
-# Description: Returns the total or current amount of spawned raiding groups.
-# Usage: set {_total} to total groups of {_raid}
-object property (total|1¦spawned) [raiding] groups:
-	return type: integer
-	get:
-		return if expr-1 is not instance of Raid
-		return (expr-1.getTotalGroups() if parse mark != 1, else expr-1.getSpawnedGroups())
-
-# Name: Raid health
-# Description: Gets the sum of all raiders' healths.
-# Usage: set {_h} to total health of {_raid}
-object property [total] health:
-	return type: number
-	get:
-		return if expr-1 is not instance of Raid
-		return expr-1.getTotalHealth() / 2
-
-# Name: Raid wave count
-# Description: Returns the amount of waves of a raid.
-# Usage: set {_am} to total wave count of {_raid}
-object property [total] wave(s| count):
-	return type: integer
-	get:
-		return if expr-1 is not instance of Raid
-		return expr-1.getTotalWaves()
-
-# Name: Origin
-# Description: Returns the location where the entity originates from.
-# Usage: teleport victim to victim's origin
-# Note: Requires Paper
-entity property origin:
-	return type: location
-	parse:
-		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
-		Skript.error("The 'origin' expression is not supported on this server software")
-	get:
-		return expr-1.getOrigin()
-
-# Name: Common elements
-# Description: Returns a list with the common objects of two lists.
-# Usage: remove common elements of {t::*} and {j::*} from {d::*}
-plural expression [(all [[of] the]|the)] common (objects|elements|values) of %objects% and %objects%:
-	return type: objects
-	get:
-		return exprs-1 where [exprs-2 contains input]
-
-# Name: Random location
-# Description: Returns a random location between two points.
-# Usage: set block at random location between player and {_ta} to diamond block
-expression [a] random location (between|within|from) %location% (to|and) %location%:
-	return type: location
-	get:
-		set {_x} to random number from min(expr-1's x-pos and expr-2's x-pos) to max(expr-1's x-pos and expr-2's x-pos)
-		set {_y} to random number from min(expr-1's y-pos and expr-2's y-pos) to max(expr-1's y-pos and expr-2's y-pos)
-		set {_z} to random number from min(expr-1's z-pos and expr-2's z-pos) to max(expr-1's z-pos and expr-2's z-pos)
-		return location at {_x}, {_y}, {_z} in expr-1's world
-
-# Name: Hyperbolic cosine/sine/tangent
-# Description: Returns the hyperbolic cosine/sine/tangent of a number.
-# Usage: set {_tanh} to hyperbolic tan of {_v}
-number property hyperbolic (1¦cos[ine]|2¦sin[e]|tan[gent]):
-	return type: number
-	get:
-		return Math.cosh(expr-1) if parse mark = 1
-		return Math.sinh(expr-1) if parse mark = 2
-		return Math.tanh(expr-1) 
-
-# Name: Nth number of the Fibonacci sequence
-# Description: Returns the Nth number of the Fibonacci sequence.
-# Usage: set {_newPrice} to (player's level)th number of the fibonacci sequence
-expression [the] %integer%(st|nd|rd|th) (term|number) (of|from) [the] fibonacci (sequence|series):
-	return type: integer
-	get:
-		return round((((sqrt(5) + 1) / 2) ^ expr-1) / sqrt(5))
-
-# Name: Command permission
-# Description: Returns the permission of a command.
-# Usage: send "You don't have permission!" if player has permission (permission of command)
-string property [(command|cmd)] permission:
-	return type: string
-	get:
-		return server.getServer().getCommandMap().getCommand(expr-1).getPermission()
-
-# Name: Uptime
-# Description: Returns the uptime of th server.
-# Usage: send "The server has been online for: %uptime%"
-expression [the] [server['s]] uptime:
-	return type: timespan
-	get:
-		return new Timespan(ManagementFactory.getRuntimeMXBean().getUptime())
-
-# Name: Tile entities of chunk
-# Description: Returns a list of the tile entities in a chunk.
-# Usage: loop tile entities of event-chunk:
-plural chunk property [all [[of] the]] tile entities:
-	return type: blocks
-	get:
-		loop ...expr-1.getTileEntities():
-			set {_r::%loop-value.getLocation()%} to block at loop-value.getLocation()
-		return {_r::*}
-
-# Name: Loaded chunks
-# Description: Returns the loaded chunks of a world.
-# Usage: set {_c} to random element of loaded chunks of player's world
-plural world property [all [[of] the]] loaded chunks:
-	return type: chunks
-	get:
-		return ...expr-1.getLoadedChunks()
-
-# Name: Sleeping ignored 
-# Description: Get or change if the player will be ignored when sleeping.
-# Usage: set sleeping ignored of all players to true
-players property (ignore[d] sleep[ing]|sleep[ing] ignored) [state]:
-	return type: boolean
-	get:
-		loop exprs-1:
-			set {_r::%loop-expression%} to loop-expression.isSleepingIgnored()
-		return {_r::*}
-	set boolean:
-		loop exprs-1:
-			loop-expression.setSleepingIgnored(change value)
-
-# Name: Item recipe ingredients
-# Description: Get a list with all the items needed to craft the given item.
-# Usage: set {_i::*} to recipe ingredients of chest
-plural itemtype property [(craft[ing]|recipe)] ingredients:
-	return type: items
-	get:
-		set {_recipe} to try server.getServer().getRecipesFor(random item of expr-1).get(0)
-		return ...{_recipe}.getIngredientList() if {_recipe} is instance of ShapelessRecipe
-		return ...{_recipe}.getIngredientMap().values() if {_recipe} is instance of ShapedRecipe
-		return ...{_recipe}.getIngredients() if {_recipe} is instance of MerchantRecipe
-		return {_recipe}.getInput() if {_recipe} is instance of CookingRecipe or StonecuttingRecipe
-
-# Name: Total experience
-# Description: Get or change the total experience of a player.
-# Usage: add 16 to xp of player
-player property [total] (experience|[e]xp) [points]:
-	return type: integer
-	get:
-		set {_level} to expr-1's level
-		return calcExperience({_level})
-	set number:
-		set expr-1's level to 0
-		set expr-1's level progress to 0
-		expr-1.giveExp(change value)
-	add number:
-		expr-1.giveExp(change value)
-	remove number:
-		set {_xp} to calcExperience((expr-1's level).longValue())
-		set {_setTo} to {_xp} - (change value)
-		set expr-1's level to 0
-		set expr-1's level progress to 0
-		expr-1.giveExp({_setTo})
-	reset:
-		set expr-1's level to 0
-		set expr-1's level progress to 0
-
-# Name: Vector distance
-# Description: Returns the distance between two vectors.
-# Usage: set {_dist} to distance between {_v1} and {_v2}
-expression:
-	return type: number
-	patterns:
-		[the] vector distance [(1¦squared)] between %vector% and %vector%
-		[the] [(1¦squared)] vector distance between %vector% and %vector%
-	get:
-		return (expr-1.distance(expr-2) if parse mark != 1, else expr-1.distanceSquared(expr-2))
-
-# Name: Current path
-# Description: Returns the current path of an entity.
-# Usage: set {path} to current path of event-entity
-# Note: Requires Paper
-livingentity property [current] path:
-	return type: object
-	parse:
-		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
-		Skript.error("The 'current path' expression is not supported on this server software")
-	get:
-		return try expr-1.getPathfinder().getCurrentPath()
-
-# Name: Final/next point of path
-# Description: Returns the final or next point of a path.
-# Usage: teleport {_spectators::*} to next point of {_path}
-# Note: Requires Paper
-object property (final|1¦next) [path[finding]] point:
-	return type: location
-	parse:
-		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
-		Skript.error("The 'final/next point' expression is not supported on this server software")
-	get:
-		return if expr-1 is not instance of PathResult
-		return (expr-1.getNextPoint() if parse mark = 1, else expr-1.getFinalPoint())
-
-# Name: All points of path
-# Description: Returns a list of all the points of a path.
-# Usage: set {_p::*} to points of {_path}
-# Note: Requires Paper
-plural object property [(all [[of] the]|the)] [path[finding]] points:
-	return type: locations
-	parse:
-		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
-		Skript.error("The 'all points' expression is not supported on this server software")
-	get:
-		return if expr-1 is not instance of PathResult
-		return ...expr-1.getPoints()
-
-# Name: Location line
-# Description: Gets a line of locations between two points. The density controls the
-#              distance between each point.
-# Usage: show flame at line from {p1} to {p2} with density 10
-plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] line (between|from|within) %location% (to|and) %location% (with|of|using) [a] density [of] %number%:
-	return type: locations
-	get:
-		set {_vector1} to vector from expr-1
-		set {_vector2} to vector from expr-2
-		set {_points} to floor({_vector1}.distance({_vector2}) * expr-3) + 1
-		set {_d} to (vector from expr-1 to expr-2).multiply(1 / {_points})
-		loop {_points} times:
-			set {_r::%loop-number%} to (location at 0, 0, 0 in expr-1's world) ~ ({_d}.clone().multiply(loop-number) ++ {_vector1})
-		return {_r::*}
-
-# Name: Circle
-# Description: Returns the points of a circle from the center, radius, and density. 
-#              The density controls the distance between each point.
-# Usage: show happy villager at a circle at player with radius 7, density 3
-plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] circle (at|from) %location% (with|of) [a] radius [of] %number%(,| and) [with] [a] density [of] %number%:
-	return type: locations
-	get:
-		set {_points} to floor(expr-2 * expr-3 * 3.141592653589793)
-		set {_angle} to 360 / {_points}
-		loop {_points} times:
-			set {_r::%loop-number%} to expr-1  ~ (new cylindrical vector from expr-2, (loop-number * {_angle}), 0)
-		return {_r::*}
-
-# Name: Sphere
-# Description: Returns the points of a sphere from its center, radius, and density.
-#              The density controls the distance between each point.
-# Usage: show smoke at points of a sphere at player with a radius of 10 and a density of 1
-plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] sphere (at|from) %location% (with|of) [a] radius [of] %number%(,| and) [with] [a] density [of] %number%:
-	return type: locations
-	get:
-		set {_points} to floor(expr-2 * expr-3 * 3.141592653589793)
-		set {_dy} to 360 / {_points}
-		set {_dp} to 360 / {_points}
-		loop ({_points} ^ 2) times:
-			set {_r::%loop-number%} to expr-1 ~ (new spherical vector expr-2, {_y}, {_p})
-			add {_dp} to {_p}
-			floor(mod(loop-number, {_points})) = 0
-			add {_dy} to {_y}
-			set {_p} to 0
-		return {_r::*}
-
-# Name: Helix
-# Description: Returns the points of a helix from a location, radius, step, height, and density.
-#              The density controls the distance between each point.
-#              A negative slope will reverse the rotation of the helix.
-# Usage: show green spark at helix at player with radius 3, height 10, step 3, density 5
-plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] helix (at|from) %location% (of|with) [a] radius [of] %number%(,| and) [with] [a] height [of] %number%(,| and) [with] [a] [height] (step|increase|slope) [of] %number%(,| and) [with] [a] density [of] %number%:
-	return type: locations
-	get:
-		set {_points} to floor(expr-2 * expr-3 * expr-5 * 2 * 3.141592653589793)
-		set {_da} to (360 * expr-3 / (expr-4 * {_points}))
-		set {_dh} to expr-3 / {_points}
-		loop {_points} times:
-			set {_r::%loop-number%} to expr-1 ~ (cylindrical vector with expr-2, ({_da} * loop-number), ({_dh} * loop-number))
-		return {_r::*}
-
-# Name: Linked locations
-# Description: Returns a list of points that link multiple locations with lines.
-#              The density controls the distance between each point.
-# Usage: show flame at {_points::*} linked using a density of 10
-plural expression:
-	return type: locations
-	patterns:
-		%locations% (linked|connected) (with|using) [a] density [of] %number%
-		(link|connect)[ed] %locations% (with|using) [a] density [of] %number%
-	get:
-		loop exprs-1:
-			add 1 to {_i}
-			set {_l} to loop-expression
-			set {_v::%{_i}%} to vector from {_l}
-		loop {_v::*}:
-			loop {_v::*}:
-				set {_points} to floor((loop-value-1.distance(loop-value-2) * expr-2) + 1)
-				set {_d} to (loop-value-2 -- loop-value-1).multiply(1 / {_points})
-				loop {_points} times:
-					set {_o} to (location at 0, 0, 0 in (first element of exprs-1)'s world) ~ ({_d}.clone().multiply(loop-number) ++ loop-value-1)
-					set {_r::%{_o}%} to {_o} if {_r::%{_o}%} is not set
-		return {_r::*}
-
-# Name: Triangle
-# Description: Returns the points of a triangle from the center, radius, and density
-#              The density controls the distance between each point.
-# Usage: show happy villager at triangle at player with radius 3 and density 1
-# Note: Requires the `Linked locations` expression.
-plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] triangle (at|from) %location% (with|of) [a] radius [of] %number%(,| and) [with] [a] density [of] %number%:
-	return type: locations
-	get:
-		loop 3 times:
-			set {_r::%loop-number%} to expr-1  ~ (cylindrical vector from expr-2, (120 * loop-number), 0)
-		return link {_r::*} with density expr-3
-
-# Name: Star
-# Description: Returns the points of the outline of a star from the center, radius, and density.
-#              The density controls the distance between each point.
-# Usage: show happy villager at star at block 8 in front of player with radius 10 and density 5
-plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a] star (at|from) %location% (with|of) [a] radius [of] %number%(,| and) [a] density [of] %number%:
-	return type: locations
-	get:
-		loop 5 times:
-			set {_p::%loop-number%} to expr-1 ~ (cylindrical vector expr-2, (loop-number * 72), 0)
-		set {_l::*} to (3, 4, 4, 5 and 5)
-		loop {_l::*}:
-			set {_i} to (loop-index parsed as number)th element of (1, 1, 2, 2 and 3)
-			set {_r::*} to {_r::*} and line between {_p::%{_i}%} and {_p::%loop-value%} with density expr-3
-		return {_r::*}
-
-# Name: Ellipse
-# Description: Returns the points of the outline of an ellipse from the x and z radiuses and the density.
-#              The density controls the distance between each point.
-# Usage: show happy villager at ellipse at event-entity with x-radius 3, z-radius 9, density 1
-plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a[n]] ellipse (at|from) %location% (with|of) [a] x(-| )radius [of] %number%(,| and) [a] z(-| )radius [of] %number%(,| and) [with] [a] density [of] %number%:
-	return type: locations
-	get:
-		set {_h} to ((expr-2) - (expr-3)) / (expr-2 + expr-3)
-		set {_points} to 3.141592653589793 * (expr-2 + expr-3) * ((135168 - (85760 * {_h}) - (5568 * {_h}^2) - (3687 * {_h}^3)) / (135168 - (119552 * {_h}) + (22208 * {_h}^2) - (345 * {_h}^3))) * expr-4
-		set {_angle} to 360 / {_points}
-		loop {_points} times:
-			add {_angle} to {_cangle}
-			set {_r} to (expr-2 * expr-3) / sqrt((expr-3 * cos({_cangle})^2) + (expr-2 * sin({_cangle})^2))
-			set {_r::%{_cangle}%} to expr-1 ~ (cylindrical vector {_r}, {_cangle}, 0) 
-		return {_r::*}
-
-# Name: Ellipsoid
-# Description: Returns the points of an ellipsoid from three coordinate axes and density.
-#              The density controls the distance between each point.
-# Usage: show smoke at (ellipsoid at block 10 in front of player with x-radius 3, y-radius 10, z-radius 9, density 1)
-plural expression [(all [[of] the]|the)] [(loc[ation]s|points) of] [a[n]] ellipsoid (at|from) %location% (with|of) [a] x(-| )radius [of] %number%(,| and) [a] y(-| )radius [of] %number%(,| and) [a] z(-| )radius [of] %number%(,| and) [with] [a] density [of] %number%:
-	return type: locations
-	get:
-		set {_a} to expr-4^1.6075 
-		set {_b} to expr-2^1.6075 
-		set {_c} to expr-3^1.6075
-		set {_points} to (4 * 3.141592653589793 * (({_a} * {_b} + {_a} * {_c} + {_b} * {_c}) / 3)^(1 / 1.6075) * (expr-5 / 20)) 
-		set {_dy} to 360 / {_points}
-		set {_dp} to 360 / {_points}
-		loop {_points}^2 times:
-			add 1 to {_s}
-			set {_r} to (expr-2 * expr-3 * expr-4) / (sqrt(expr-2^2 * expr-3^2 * cos({_y})^2 * cos({_p})^2 + expr-4^2 * (expr-3^2 * cos({_p})^2 * sin({_y})^2 + expr-2^2 * sin({_p})^2)))
-			set {_r::%{_s}%} to expr-1 ~ (new spherical vector {_r}, {_y}, {_p})
-			add {_dp} to {_p}
-			floor(mod(loop-number, {_points})) = 0
-			add {_dy} to {_y}
-			set {_p} to 0
-		return {_r::*}
-
-# Name: Pickup delay
-# Description: Get or change the delay before an item will be available to be picked up by players.
-# Usage: set pickup delay of {_itemEntity} to 5 seconds
-entity property pick[ ]up (time|delay):
-	return type: timespan
-	get:
-		return if expr-1 is not a dropped item
-		return new Timespan(expr-1.getPickupDelay() * 50)
-	set timespan:
-		expr-1 is a dropped item
-		expr-1.setPickupDelay((change value).getTicks_i())
-
-# Name: Root vehicle
-# Description: Returns the root vehicle of an entity.
-# Usage: kill root vehicle of player
-entity property root vehicle:
-	return type: entity
-	get:
-		return CraftEntity.getEntity(server.getServer(), expr-1.getHandle().getRootVehicle())
-
-# Name: Piston reaction
-# Description: Returns the reaction of the block when moved by a piston.
-# Usage: broadcast "%piston reaction of event-block%"
-block property piston [mov(e|ing)] reaction:
-	return type: object
-	get:
-		return PistonReactions.values()[PistonReactions.ordinal(expr-1.getPistonMoveReaction())]
-
-# Name: Chunk of world
-# Description: Returns the chunk in a world from the x and y chunk coordinates.
-# Usage: set {_ch} to chunk 1, 3 of player's world
-world property chunk %number%(, | and) %number%:
-	return type: chunk
-	get:
-		return expr-1.getChunkAt(expr-2, expr-3)
-
-# Name: Nearest entity
-# Description: Returns the nearest entity to a location.
-# Usage: ignite the closest entity to {turretLoc}
-expression [the] (nearest|closest) entity (to|of) %location%:
-	return type: entity
-	get:
-		loop all entities:
-			set {_d} to the distance between expr-1 and loop-value
-			set {_r::%{_d}%} to loop-value
-		return first element of {_r::*}
-
-# Name: Parsed variables
-# Description: Returns the given string with variables parsed.
-#              Inputting "hello %%{var}%%" will replace "%%{var}%%" with the actual value.
-# Usage: set {_parsedVars} to parse variables in message
-expression:
-	return type: string
-	patterns: 
-		parse[d] var[iable]s in %string%
-		%string% with var[iable]s parse 
-	get:
-		return VariableString.newInstance(expr-1).toString(event)
-
-# Name: Sea level
-# Description: Returns the sea level of a world.
-# Usage: set {_sl} to sea level of event-world
-world property sea level:
-	return type: integer
-	get:
-		return expr-1.getSeaLevel()
-
-# Name: Height/width of entity
-# Description: Returns the height/width of an entity.
-# Usage: send "Height of %arg-1's name%: %arg-1's height%"
-entity property (1¦height|width):
-	return type: number
-	get:
-		return expr-1.getHeight() if parse mark = 1, else expr-1.getWidth()
-
-# Name: List index
-# Description: Returns the index of an object in a list.
-# Usage: set {_i} to index of player in {queue::*}
-expression index of %object% in list %~objects%:
-	return type: string
-	get:
-		loop ...Variables.getVariable((raw exprs-2).getName().toString(event), event, (raw exprs-2).isLocal()).entrySet():
-			return loop-value.getKey() if loop-value.getValue() is expr-1
+		return difference between now and expr-1 if expr-1 >= now
 		return
-
-# Name: Serialized object
-# Description: Serialized the given object.
-# Usage: set {_st} to serialized tool
-# Note: Some objects can't be serialized and an error will be thrown in console.
-expression serialize[d] %object%:
-	return type: string
-	get:
-		set {_class} to last element of (split "%class of expr-1%" at ".")
-		set {_data} to Base64.getEncoder().encodeToString(Classes.serialize(expr-1).data)
-		return "%{_class} in lowercase%:%{_data}%"
-
-# Name: Deserialized string
-# Description: Deserializes the given string.
-# Usage: set tool of player to deserialized {_st}
-expression deserialize[d] %string%:
-	return type: object
-	get:
-		set {_class} to subtext of expr-1 from indices 1 to (index of ":" in expr-1) - 1
-		set {_data} to Base64.getDecoder().decode(subtext of expr-1 from (index of ":" in expr-1) + 1 to (length of expr-1))
-		return Classes.deserialize({_class}, {_data})
-
-# Name: Fishing time
-# Description: The lure/catch time of a hook.
-#              The lure time represents the time until the fish will start going towards the hook.
-#              The bite time represents the time until the fish will bite.
-# Usage: set catch time of hook to 10 ticks
-entity property (lure|1¦(catch|bite)) time:
-	return type: timespan 
-	get:
-		return if expr-1 is not a fish hook
-		set {_hook} to expr-1.getHandle()
-		return new Timespan(({_hook}.ai if parse mark is 1, else {_hook}.ah) * 50)
-	set timespan:
-		expr-1 is a fish hook
-		set {_hook} to expr-1.getHandle()
-		if parse mark is 1:
-			set {_hook}.ai to (change value).getTicks_i()
-		else:
-			set {_hook}.ah to (change value).getTicks_i()
-
-# Name: Projectile item
-# Description: The item of a throwable projectile (e.g. snowball). Can be set.
-# Usage: set shot item of last shot snowball to dirt
-projectile property [(projectile|shot)] item:
-	return type: itemtype
-	get:
-		return if expr-1 is not instance of ThrowableProjectile
-		return expr-1.getItem()
-	set itemtype:
-		expr-1 is instance of ThrowableProjectile
-		expr-1.setItem(random item of change value)
-
-#         __  __          _       
-#        / _|/ _|        | |      
-#    ___| |_| |_ ___  ___| |_ ___ TM
-#   / _ \  _|  _/ _ \/ __| __/ __|
-#  |  __/ | | ||  __/ (__| |_\__ \
-#   \___|_| |_| \___|\___|\__|___/
-#
-
-# Name: Make players swing
-# Description: Force certain players to swing their arms for other players.
-# Usage: make player swing for targeted player
-effect (make|force) %player% [to] swing [[(with|using) [the]] (0¦main[ ]hand|3¦off[ ]hand)] [for %-players%]:
-	trigger:
-		set {_packet} to new play_server_animation packet
-		set int field 0 of {_packet} to expr-1.getEntityId()
-		set int field 1 of {_packet} to parse mark
-		send exprs-2 ? all players packet {_packet}
-
-# Name: Evaluate
-# Description: Execute a Skript effect from a string.
-# Usage: evaluate "set player's fly mode to true"
-# Credits: Runakai
-effect (eval[uate]|execute) %strings%:
-	trigger:
-		loop exprs-1:
-			TriggerItem.walk(Effect.parse("%loop-value%", null) and event)
-
-# Name: Make entity damage entity
-# Description: Make an entity damage another entity
-# Usage: make player damage targeted player by 10
-effect (make|force) %entity% damage %entity% [by %-number%]:
-	trigger:
-		expr-2.damage(((expr-3 * 2) ? null) and expr-1)
-
-# Name: Create square 
-# Description: Creates a full square or only its margins from a location (the center) and a size.
-# Usage: create a square border from event-block and size 5 using obisidian
-# Note: Requires 'Square corners' expression
-effect create [a] square [(1¦(border[s]|margin[s]|side[s]))] (at|from) [center] %location% [(with|and)] (size|radius) %int% using [item] %item%:
-	trigger:
-		set {_c::*} to square corners from center expr-1 and size expr-2
-		loop {_c::*}:
-			set {_} to ((loop-index parsed as int) + 1) if {_c::%((loop-index parsed as int) + 1)%} is set, else 1
-			set (all blocks from block at loop-value to block at {_c::%{_}%}) to expr-3
-		if parse mark != 1:
-			set {_} to expr-2
-			loop expr-2 times:
-				create square border from center expr-1 size {_} using item expr-3
-				subtract 1 from {_}
-			set block at expr-1 to expr-3
-
-# Name: Hide entity
-# Description: Hide an entity from certain players.
-# Usage: destroy player's targeted entity from (all players in radius 10 of player)
-effect (hide|remove|destroy) %entities% [(from|for) %-players%]:
-	trigger:
-		set {_packet} to new play_server_entity_destroy packet
-		loop exprs-1:
-			set {_i} to ({_i} ? 1) + 1
-			set {_id::%{_i}%} to loop-expression.getEntityId()
-		set int array field of {_packet} to {_id::*}
-		send exprs-2 ? all players packet {_packet}
-
-# Name: Make entity pathfind
-# Description: Make a certain entity pathfind to a location.
-# Usage: make event-entity pathfind to {arena} at speed 2.1
-# Note: Requires Paper
-effect (make|force) %livingentity% [to] pathfind to %location% [(at|with) speed %-number%]:
-	parse:
-		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
-		Skript.error("The 'make pathfind' effect is not supported on this server software")
-	trigger:
-		try expr-1.getPathfinder().moveTo(expr-2 and (expr-3 ? 1))
-
-# Name: Stop entity from pathfinding
-# Description: Make a certain entity stop from pathfinding.
-# Usage: stop event-entity from pathfinding
-# Note: Requires Paper
-effect (stop|cancel|deny) %livingentity% (to|from) pathfind[ing]:
-	parse:
-		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
-		Skript.error("The 'stop pathfind' effect is not supported on this server software")
-	trigger:
-		try expr-1.getPathfinder().stopPathfinding()
-
-# Name: Increment/decrement a variable
-# Description: Increase or decrease a variable by 1.
-# Usage: {level}++
-# Credits: Blueyescat
-effect %number%[ ](1¦++|-1¦--):
-	parse:
-		continue if ChangerUtils.acceptsChange(expr-1, (ChangeMode.ADD if parse mark is 1, else ChangeMode.REMOVE) and number) is true	
-		Skript.error("'%expr-1%' can't be %(""increased"") if parse mark is 1, else ""decreased""%")
-	trigger:
-		set raw expr-1 to expr-1 + parse mark
-
-# Name: Regex replace
-# Description: Replace all of the occurrences of a regex pattern in a string.
-# Usage: regex replace all "\d" with "" in {_description}
-effect regex replace [all] %string% with %string% in %~string%:
-	parse:
-		continue if ChangerUtils.acceptsChange(expr-3, ChangeMode.SET and text) is true	
-		Skript.error("'%expr-3%' can't be changed")
-	trigger:
-		set raw expr-3 to expr-3.replaceAll(expr-1 and expr-2)
-
-# Name: Make entity look at location
-# Description: Makes an entity look at a certain location.
-# Usage: make last spawned armorstand look at {_target}
-effect (make|force) %livingentity% (look (at|to[wards])|face) %location%:
-	trigger:
-		teleport expr-1 to expr-1.getLocation().setDirection(vector from expr-1 to expr-2)
-
-# Name: Open or close chest
-# Description: Makes a chest appear as opened or closed.
-# Usage: make event-block look opened for all players in radius 3 of event-location
-effect make %block% (appear|show|look) [as] (0¦close[d]|1¦open[ed]) [for %-players%]:
-	trigger:
-		set {_packet} to new play_server_block_action packet
-		set location field 0 of {_packet} to location of expr-1
-		set block field 0 of {_packet} to type of expr-1
-		set int field 0 of {_packet} to 1
-		set int field 1 of {_packet} to parse mark
-		send (exprs-2 ? all players) packet {_packet}
-
-# Name: Rotate a player
-# Description: Rotates a player without teleportation.
-# Usage: rotate all players by 3 horizontally and 7 vertically
-effect rotate %players% by %number% [horizontally] [[and] %-number% [vertically]]:
-	trigger:
-		set {_packet} to new play_server_position packet
-		loop exprs-1:
-			set {_p} to loop-expression
-			set double field 0 of {_packet} to {_p}'s x-pos
-			set double field 1 of {_packet} to {_p}'s y-pos
-			set double field 2 of {_packet} to {_p}'s z-pos
-			set float field 0 of {_packet} to {_p}'s yaw + expr-2 
-			set float field 1 of {_packet} to {_p}'s pitch + (expr-3 ? 0)
-			send {_p} packet {_packet}
-
-# Name: Make player sprint
-# Description: Makes a certain player start sprinting.
-# Usage: make player sprint
-effect (force|make) %players% [to] [start] (sprint[ing]|run[ning]):
-	trigger:
-		loop exprs-1:
-			loop-expression.setSprinting(true)
-
-# Name: Make player sneak
-# Description: Makes a certain player start sneaking.
-# Usage: force player to start sneaking
-effect (force|make) %players% [to] [start] (crouch|sneak)[ing]:
-	trigger:
-		loop exprs-1:
-			loop-expression.setSneaking(true)
-
-# Name: Op or deop player
-# Description: Op or deop a certain player.
-# Usage: op player
-effect (op|1¦de[(-| )]op) %players%:
-	trigger:
-		loop exprs-1:
-			loop-expression.setOp(true if parse mark != 1, else false)
-
-# Name: Make projectile home
-# Description: Makes a projectile home towards a location.
-# Usage: make event-projectile home to {_v}
-# Note: Has some visual problems due to the high speed. 
-effect make %projectile% home (to[wards]|at) %location%:
-	trigger:
-		set expr-1's velocity to vector from expr-1 to expr-2
-
-# Name: Grow and ungrow
-# Description: Grow or ungrow a plant by a certain amount of stages.
-# Usage:grow player's targeted block by 1 stage
-effect [(1¦(de|un))]grow %block% [by %-integer% stage[s]]:
-	trigger:
-		try expr-1.getBlockData() is instance of BlockDataAgeable
-		set {_b} to expr-1.getBlockData()
-		set {_age} to expr-1.getBlockData().getAge()
-		if parse mark != 1:
-			set {_v} to (expr-2 if expr-2 <= ({_b}.getMaximumAge() - {_age}), else ({_b}.getMaximumAge() - {_age})) if expr-2 is set
-		else:
-			set {_v} to (expr-2 if expr-2 <= {_age}, else {_age}) if expr-2 is set
-		{_b}.setAge({_age} + (({_v} ? 1) * (-1 if parse mark = 1, else 1)))
-		expr-1.setBlockData({_b})
-
-# Name: Insert elements
-# Description: Inserts a list of objects at a certain index in a list.
-# Usage: insert {_values::*} at index 2 in {list::*}
-effect insert [(objects|values|elements)] %objects% at [index] %integer% in %~objects%:
-	trigger:
-		set {_o::*} to exprs-3
-		loop {_o::*}:
-			set {_i} to {_i} + 1
-			if {_i} = expr-2:  
-				loop (size of exprs-1) times:
-					set {_s} to ((loop-number) + {_i}) - 1
-					set {_r::%{_s}%} to (loop-number)th element of exprs-1
-				set {_i} to {_i} + (size of exprs-1) 
-				set {_r::%{_i}%} to {_o::%loop-index%}
-			else:
-				set {_r::%{_i}%} to loop-value
-		set raw exprs-3 to {_r::*}
-
-# Name: Splice list
-# Description: Splices a list at a certain index.
-# Usage: splice {_o::*} by index 5
-effect splice %~objects% (at|by) [index] %integer%:
-	trigger:
-		set {_e::*} to exprs-1
-		loop {_e::*}:
-			if loop-index parsed as number != expr-2:
-				set {_i} to (size of {_r::*}) + 1
-				set {_r::%{_i}%} to loop-value
-		set raw exprs-1 to {_r::*}
-
-# Name: Force player to sleep
-# Description: Makes a player sleep at a given location as long as there is a bed
-#              at the given location.
-# Usage: make player sleep at {_bed}
-effect (force|make) %players% [to] sleep at %location%:
-	trigger:
-		loop exprs-1:
-			loop-expression.sleep(expr-2, true)
-
-# Name: Force player to wake up
-# Description: Makes a player wake up, with or without setting their spawnpoint
-#              at the bed they're in.
-# Usage: force player to wake up
-effect (force|make) %players% [to] wake[ ]up [(1¦and set spawn[[ ]point])]:
-	trigger:
-		loop exprs-1:
-			try loop-expression.wakeup(true if parse mark = 1, else false)
-
-# Name: Refresh chunks
-# Description: Refreshes the given chunks asynchronously.
-# Usage: refresh chunk at player
-effect (reload|refresh) [chunk[s]] %chunks%:
-	trigger:
-		create new section with {_c::*} and store it in {_s}:
-			loop {_c::*}:
-				try loop-value.getWorld().refreshChunk(loop-value.getX(), loop-value.getZ())
-		run section {_s} async with exprs-1
-
-# Name: Async set blocks
-# Description: Sets the blocks between two points asynchronously.
-# Usage: async set blocks from {p1} to {p2} to dirt
-# Note: Requires FastAsyncWorldEdit (FAWE)
-effect async[hronously] set [(all [[of] the]|the)] blocks (from|within|between) %location% (to|and) %location% to %itemtype%:
-	parse:
-		continue if server.getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") is set
-	trigger:
-		set {_editSession} to new EditSessionBuilder(FaweAPI.getWorld("%world of expr-1%")).fastmode(true).build()
-		set {_pos1} to BlockVector3.at(floor(x-pos of expr-1), floor(y-pos of expr-1), floor(z-pos of expr-1))
-		set {_pos2} to BlockVector3.at(floor(x-pos of expr-2), floor(y-pos of expr-2), floor(z-pos of expr-2))
-		set {_region} to new CuboidRegion({_pos1}, {_pos2}) 
-		set {_baseBlock} to new BlockPattern(new BaseBlock(BukkitAdapter.asBlockState(random item of expr-3)))
-		await {_editSession}.setBlocks({_region}, {_baseBlock})
-
-# Name: Paste schematic
-# Description: Paste a schematic at a give location.
-# Usage: paste schematic "plugins\FastAsyncWorldEdit\schematics\house.schem" at player with air
-# Note: Requires FastAsyncWorldEdit (FAWE)
-effect paste schematic %string% at %location% [(1¦(with|including) air)]:
-	parse:
-		continue if server.getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") is set
-	trigger:
-		set {_schematic} to new File(expr-1)
-		set {_pos} to BlockVector3.at((x-pos of expr-2), (y-pos of expr-2), (z-pos of expr-2))
-		set {_includeAir} to true if parse mark = 1, else false
-		await ClipboardFormats.findByFile({_schematic}).load({_schematic}).paste(new BukkitWorld(world of expr-2), {_pos}, true, {_includeAir}, null)
-
-# Name: Show totem animation
-# Description: Displays the totem of undying animation to the given players.
-# Usage: show totem animation to {_team::red::*}
-effect (play|show|display) [the] totem [of undying] animation (to|for) %players%:
-	trigger:
-		set {_packet} to new play_server_entity_status packet
-		loop exprs-1:
-			set int field 0 of {_packet} to loop-expression.getEntityId()
-			set byte field 0 of {_packet} to 35
-			send loop-expression packet {_packet}
-
-# Name: Call function
-# Description: Calls a function with the given arguments.
-#              The function can be called asynchronously.
-# Usage: call function "sendMsgToStaff" with args "hello there"
-effect (call|run|execute) function %string% [(1¦async[hronously])] [(with|using) [[the] arg[ument][s]] %-objects%]:
-	trigger:
-		set {_f::run} to function reference expr-1 called with exprs-2
-		set {_proxy} to new proxy instance of Runnable using {_f::*}
-		if parse mark = 1:
-			await {_proxy}.run()
-		else:
-			{_proxy}.run()
-
-# Name: Make player eat
-# Description: Makes a player insta-eat the item from the mainhand/offhand.
-#              The player must hold an edible item.
-# Usage: make all players eat with the offhand
-effect (make|force) %players% [to] eat [with [the] (1¦main[ ]hand|2¦off[ ]hand)]:
-	trigger:	
-		set {_hand} to (EnumHand.OFF_HAND if parse mark = 2, else EnumHand.MAIN_HAND)
-		loop exprs-1:
-			set {_handle} to loop-expression.getHandle()
-			{_handle}.c({_hand})
-			{_handle}.s()
-
-# Name: Open book
-# Description: Opens a book for the given players.
-# Isage: open tool of player to all players
-effect (show|open) book %itemtype% to %players%:
-	trigger:
-		set {_book} to random item of expr-1
-		{_book}'s type is a written book
-		loop exprs-2:
-			loop-expression.openBook({_book})
-
-# Name: Open sign
-# Description: Opens a sign for the given players. The sign can be edited.
-# Usage: open sign targeted block to all players
-# Note: Requires Paper
-effect (show|open) sign %block% to %players%:
-	parse:
-		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
-		Skript.error("The 'open sign' effect is not supported on this server software")
-	trigger:
-		set {_sign} to expr-1.getState()
-		loop exprs-2:
-			loop-expression.openSign({_sign})
-
-# Name: Teleport async
-# Description: Teleport entities to a location asynchronously.
-# Usage: async teleport all entities to {spawn} async
-effect:
-	patterns:
-		async[hronously] teleport %entities% (to|at) %location% 
-		teleport %entities% (to|at) %location% async[hronously]
-	trigger:
-		loop exprs-1:
-			try loop-expression.teleportAsync(expr-2)
-
-#                       _ _ _   _                 
-#                      | (_) | (_)                
-#    ___ ___  _ __   __| |_| |_ _  ___  _ __  ___ TM
-#   / __/ _ \| '_ \ / _` | | __| |/ _ \| '_ \/ __|
-#  | (_| (_) | | | | (_| | | |_| | (_) | | | \__ \
-#   \___\___/|_| |_|\__,_|_|\__|_|\___/|_| |_|___/
-#
-
-# Name: Integer is divisible
-# Description: Checks if an integer is divisible by one or more integers.
-# Usage: send "Is Odd" if {_input} is not divisible by 2
-condition:
-	patterns:
-		%integers% (is|are) divisible by %integer%
-		%integers% can be divided by %integer%
-		%integers% (1¦(is|are)(n't| not)) divisible by %integer%
-		%integers% (1¦can(not|n't)) be divided by %integer%
-	check:
-		negate the condition if parse mark = 1
-		loop exprs-1:
-			set {_n} to loop-expression
-			stop if mod({_n}, expr-2) != 0
-		continue
-
-# Name: Inventory is completley filled
-# Description: Checks if an inventory can hold any item.
-# Usage: send "FULL" if player's inventory is completley filled
-inventory property condition completley (full|filled):
-	check:
-		continue if (slots (integers from 0 to (expr-1.getSize() if holder of expr-1 is not a player, else 36) - 1) of expr-1 where [item amount of input != max stack size of input]) is not set
-
-# Name: String exactly equals
-# Description: Checks if a string exactly equals another string. (case sensitive)
-# Usage: set {winner} to player if message exactly equals "0infbgHSjf"
-condition:
-	patterns:
-		%string% [(1¦(does(n't | not )|!))](exactly equal[s]|==) %string%
-		%string% (is|1¦is(n't| not)) exactly equal to %string%
-	check:
-		negate the condition if parse mark = 1
-		continue if expr-1.equals(expr-2) = true
-
-# Name: If boolean
-# Description: Simplifies codes like `if true = true` to `if true`.
-# Usage: while true:
-condition %boolean%:
-	check:
-		continue if expr-1 is true
-
-# Name: Regex matches
-# Description: Checks if a string matches a regex pattern.
-# Usage: cancel event if message regex matches "\W"
-condition %string% [(1¦does(n't| not))] regex match[es] %string%:
-	check:
-		negate the condition if parse mark = 1
-		continue if try RegexPattern.compile(expr-2).matcher(expr-1).find() is true
-
-# Name: Location is within border
-# Description: Checks if a location is within the world border.
-# Usage: stop if {_} is not within worldborder
-location property condition (within|inside) [the] world[(-| )]border:
-	check:
-		continue if expr-1.getWorld().getWorldBorder().isInside(expr-1) = true
-
-# Name: Number is prime
-# Description: Checks if the given integer is a prime number.
-# Usage: set {_fancyMaths} to (sqrt({_n})) + (log({_n} / ln({_n}))) if {_n} is prime
-integer property condition prime [number]:
-	check:
-		while ({_c} ? 2) <= sqrt(expr-1):
-			stop if mod(expr-1, ({_c} ? 2)) = 0
-			set {_c} to ({_c} ? 2) + 1
-		continue
-
-# Name: Block is passable
-# Description: Checks if a block is passable.
-#              A block is passable if it has no colliding parts that would prevent players from moving through it.
-# Usage: if event-block is passable:
-block property condition passable:
-	check:
-		continue if expr-1.isPassable() is true
-	
-# Name: Entity has path
-# Description: Checks if an entity has a path to follow.
-# Usage: stop if event-entity has a path
-# Note: Requires Paper
-condition %livingentity% has[(1¦(n't| not))] [got] [a] path:
-	parse:
-		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
-		Skript.error("The 'has path' condition is not supported on this server software")
-	check:
-		negate the condition if parse mark = 1
-		continue if try expr-1.getPathfinder().hasPath() = true
-
-# Name: Chunk is slime chunk
-# Description: Checks if a chunk is a slime chunk.
-# Usage: if event-chunk is a slime chunk:
-chunk property condition slime(y| chunk):
-	check:
-		continue if expr-1.isSlimeChunk() is true
-
-# Name: Item is fuel
-# Description: Checks if an item can be used as fuel for furnace.
-# Usage: broadcast "a" if player's tool cannot be used as fuel
-condition:
-	patterns:
-		%itemtype/item% is[(1¦(n't| not))] fuel
-		%itemtype/item% can[(1¦('t|not))] be used as fuel
-	check:
-		negate the condition if parse mark = 1
-		continue if (random item of expr-1).getType().isFuel() is true
-
-# Name: Raid started
-# Description: Checks if a raid started or not.
-# Usage: if {_raid} is active:
-object property condition (active|started):
-	check:
-		expr-1 is instance of Raid
-		continue if expr-1.isStarted() = true
-
-# Name: Location is within
-# Description: Checks if a location is within two points.
-# Usage: if player's location is within {_pos} and {spawnPoint}
-location property condition (within|between) %location% and %location%:
-	check:
-		expr-1's x-pos is between min((expr-2's x-pos) and (expr-3's x-pos)) and max((expr-2's x-pos) and (expr-3's x-pos))
-		expr-1's y-pos is between min((expr-2's y-pos) and (expr-3's y-pos)) and max((expr-2's y-pos) and (expr-3's y-pos))
-		expr-1's z-pos is between min((expr-2's z-pos) and (expr-3's z-pos)) and max((expr-2's z-pos) and (expr-3's z-pos))
-		continue
-
-# Name: Vector is normalized
-# Description: Checks if a vector is normalized.
-# Usage: broadcast "yeeee" if {_vector} is normalized
-vector property condition normalized:
-	check:
-		continue if expr-1.isNormalized() = true
-
-# Name: Has line of sight
-# Description: Checks if an entity has line of sight to another entity.
-# Usage: if event-player has line of sight to {_target}
-condition %entity% has[(1¦(n't| not))] [got] [a] line of sight to %entity%:
-	check:
-		negate the condition if parse mark = 1
-		continue if expr-1.hasLineOfSight(expr-2)
-
-# Name: Entity is wet
-# Description: Checks if an entity is wet (in water or rain).
-# Usage: if player is wet:
-# Note: Requires Paper
-entity property condition (wet|in (1¦water|2¦rain)|in water(,| or) rain):
-	parse:
-		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
-		Skript.error("The 'is in liquid' condition is not supported on this server software")
-	check:
-		if parse mark = 1:
-			continue if expr-1.isInWater() = true
-		else if parse mark = 2:
-			continue if expr-1.isInRain() = true
-		else:
-			continue if expr-1.isInWaterOrRain() = true
-
-# Name: Itemtype is occluding
-# Description: Check if the itemtype is a block and completely blocks vision.
-# Usage: if event-block's type is occluding:
-itemtype property condition occluding:
-	check:
-		continue if (random item of expr-1).getType().isOccluding() = true
-
-# Name: Itemtype is unbreakable
-# Description: Checks if an item is unbreakable.
-# Usage: send "Your tool is not unbreakable" if tool of player is not unbreakable
-itemtype property condition unbreakable:
-	check:
-		continue if expr-1.getItemMeta().isUnbreakable() = true
-
-# Name: Entity is in lava
-# Description: Checks if an entity is in lava
-# Usage: send "BURRRRRRRRRRRRRRRRNING" if player is in lava
-# Note: Requires Paper
-entity property condition in lava:
-	parse:
-		continue if Skript.getServerPlatform() = ServerPlatform.BUKKIT_PAPER
-		Skript.error("The 'is in liquid' condition is not supported on this server software")
-	check:
-		continue if expr-1.isInLava() = true
-
-
-
-#
-#   _______ _              ______           _  
-#  |__   __| |            |  ____|         | | 
-#     | |  | |__   ___    | |__   _ __   __| |         ... for now ;) ...
-#     | |  | '_ \ / _ \   |  __| | '_ \ / _` | 
-#     | |  | | | |  __/   | |____| | | | (_| | 
-#     |_|  |_| |_|\___|   |______|_| |_|\__,_| 
-#                                                                                                                   
-
