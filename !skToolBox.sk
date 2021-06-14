@@ -17,11 +17,15 @@
 # If you encounter any issue, feel free to report it on GitHub:
 # 	https://github.com/Mr-Darth/skToolBox/issues
 
-# Please do not edit anything below unless you know what you are doing!
+#
+# Please do not edit anything below, unless you know what you are doing!
+# No support will be provided if you proceed to edit anything below!
+#
 
 # Imports :D!
 import:
 	java.text.DecimalFormat
+	java.util.Calendar
 
 	ch.njol.skript.Skript
 	ch.njol.skript.log.SkriptLogger
@@ -234,6 +238,36 @@ string property arab[ic] numeral:
 					delete {_numeral}
 		return {_output}
 
+# Name: String with case swapped
+# Description: Swaps the case of a string. ("aaaaHEllo" will be "AAAAheLLO")
+# Usage: send name of player with case swapped
+expression %$strings% with (swapped case|case swapped):
+	return type: strings
+	get:
+		loop exprs-1:
+			add 1 to {_index}
+			loop characters at (integers from 1 to length of "%loop-value%") of "%loop-value%":
+				set {_output::%{_index}%} to join {_output::%{_index}%} and ((uppercase (loop-value-2)) if (number of lowercase characters in (loop-value-2)) > 0, else (lowercase (loop-value-2)))
+		return {_output::*}
+
+# Name: Random string
+# Description: Returns a random string with a specified length using a given range of characters (alphabetic, numeric, or alphanumeric).
+# Usage: set {code::%player's uuid%} to random alphanumeric string of length 16
+expression random (alphabetic[al]|1¦numeric[al]|2¦alphanumeric[al]) [(string|text)] (of|with) length %number% [char[acter][s]]:
+	return type: string
+	parse:
+		set {_charset::0} to "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		set {_charset::1} to "0123456789"
+		set {_charset::2} to join {_charset::0} and {_charset::1}
+		continue
+	get:
+		set {_charset} to {_charset::%parser mark%}
+		set {_charsetSize} to length of {_charset}
+		loop expr-1 times:
+			set {_index} to random integer from 1 to {_charsetSize}
+			set {_output} to join {_output} and (character at {_index} in {_charset})
+		return {_output}
+
 # Name: Rounded numbers
 # Description: Rounds the given numbers to a certain amount of decimal places (smaller
 #              than or equal to the number accuracy option in config), or to the nearest multiple of a number.
@@ -319,3 +353,44 @@ expression time until %date%:
 	get:
 		return difference between now and expr-1 if expr-1 >= now
 		return
+
+# Name: Midnight
+# Description: Returns the date of midnight.
+# Usage: set {_midnight} to midnight
+expression midnight:
+	return type: date
+	get:
+		set {_calendar} to Calendar.getInstance()
+		return date(({_calendar}.get(Calendar.YEAR)), ({_calendar}.get(Calendar.MONTH) + 1), ({_calendar}.get(Calendar.DAY_OF_MONTH) + 1), 0, 0, 0, 0)
+
+
+#         __  __          _
+#        / _|/ _|        | |
+#    ___| |_| |_ ___  ___| |_ ___ TM
+#   / _ \  _|  _/ _ \/ __| __/ __|
+#  |  __/ | | ||  __/ (__| |_\__ \
+#   \___|_| |_| \___|\___|\__|___/
+#
+
+# Name: Despawn entity
+# Description: Despawns the given entities for certain players.
+# Usage: destroy player's targeted entity for (all players in radius 10 of player)
+effect (destroy|despawn|remove) %entities% [(from|for) %-players%]:
+	parse:
+		set {_packet} to new play_server_entity_destroy packet
+		continue
+	trigger:
+		loop exprs-1:
+			add 1 to {_index}
+			set {_ids::%{_index}%} to loop-expression.getEntityId()
+		set int array field of {_packet} to {_ids::*}
+		send (exprs-2 ? all players) packet {_packet}
+
+#
+#   _______ _              ______           _
+#  |__   __| |            |  ____|         | |
+#     | |  | |__   ___    | |__   _ __   __| |
+#     | |  | '_ \ / _ \   |  __| | '_ \ / _` |
+#     | |  | | | |  __/   | |____| | | | (_| |
+#     |_|  |_| |_|\___|   |______|_| |_|\__,_|
+#
