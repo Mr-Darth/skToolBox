@@ -88,14 +88,21 @@ expression [the] [value of] (pi|π|1¦e[uler['s]] [num[ber]]):
 # Name: Integers in base
 # Description: Returns the representations of the given integers in a system with the given radix.
 # Usage: set {_binary} to 10924 in base 2
-expression %$integers% (in|to|using|with) (base|radix) %number%:
+expression %$numbers% ([converted] to|in) base %number%:
 	return type: strings
+	parse:
+		if expr-2 is instance of Literal:
+			continue if expr-2.getSingle() is between Character.MIN_RADIX and Character.MAX_RADIX
+			Skript.error("The base must be between %Character.MIN_RADIX% and %Character.MAX_RADIX%")
+		else:
+			continue
 	get:
+		return if expr-2 is not between Character.MIN_RADIX and Character.MAX_RADIX
 		loop exprs-1:
-			set {_i} to {_i} + 1
-			set {_n} to loop-expression
-			set {_r::%{_i}%} to try Integer.toString({_n} and expr-2)
-		return {_r::*}
+			add 1 to {_index}
+			set {_value} to loop-value
+			set {_output::%{_i}%} to Long.toString({_value}, expr-2)
+		return {_output::*}
 
 # Name: Mean
 # Description: Returns the average or geometric mean of a list of numbers.
