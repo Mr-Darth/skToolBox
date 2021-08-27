@@ -26,12 +26,15 @@
 import:
 	java.text.DecimalFormat
 	java.util.Calendar
+	java.lang.Runnable
+	java.nio.charset.StandardCharsets
 
 	ch.njol.skript.Skript
 	ch.njol.skript.log.SkriptLogger
 	ch.njol.skript.log.BlockingLogHandler
 	ch.njol.skript.lang.VariableString
 
+	org.bukkit.Bukkit
 	org.bukkit.inventory.ItemFlag
 
 #
@@ -66,23 +69,33 @@ expression:
 		%$numbers% [degree[s]] (in|to|as) rad[ian][s]
 		%$numbers% [rad[ian][s]] (in|to|as) degree[s]
 	return type: number
-	parse:
-		set {_conversions::*} to 0.017453292519943295 and 57.29577951308232
-		continue
 	get:
+		set {_factor} to 0.017453292519943295 if pattern is 1, else 57.29577951308232
 		loop exprs-1:
 			add 1 to {_index}
 			set {_value} to loop-value
-			set {_output::%{_index}%} to {_value} * {_conversions::%pattern%} 
+			set {_output::%{_index}%} to {_value} * {_factor}
 		return {_output::*}
 
 # Name: Mathematical constants
 # Description: Returns the value of pi or Euler's number.
 # Usage: set {_points} to {_radius} * 2 * pi
-expression [the] [value of] (pi|1¦e[uler['s]] [num[ber]]):
+expression [the] [value of] (pi|π|1¦e[uler['s]] [num[ber]]):
 	return type: number
 	get:
 		return 3.141592653589793 if parser mark is 0, else 2.718281828459045
+
+# Name: Integers in base
+# Description: Returns the representations of the given integers in a system with the given radix.
+# Usage: set {_binary} to 10924 in base 2
+expression %$integers% (in|to|using|with) (base|radix) %number%:
+	return type: strings
+	get:
+		loop exprs-1:
+			set {_i} to {_i} + 1
+			set {_n} to loop-expression
+			set {_r::%{_i}%} to try Integer.toString({_n} and expr-2)
+		return {_r::*}
 
 # Name: Mean
 # Description: Returns the average or geometric mean of a list of numbers.
@@ -116,7 +129,8 @@ plural expression:
 		return expr-1 if expr-2 < 0, else (regex split expr-1 by "(?<=\G.{%expr-2%})(?!$)")
 
 # Name: Soundex value
-# Description: Returns the soundex value of a string. (See: https://en.wikipedia.org/wiki/Soundex)
+# Description: Returns the soundex value of a string. 
+#              See https://en.wikipedia.org/wiki/Soundex for more information.
 # Usage: send "Use `command` not `%arg-1%`" if soundex value of "command" is soundex value of arg-1
 string property soundex [value]:
 	return type: string
@@ -146,11 +160,12 @@ expression [the] [(number|amount) of] (occurrences|repetitions) of %string% in %
 # Name: Parsed expressions
 # Description: Returns the given strings with expressions parsed.
 #              For instance, inputting "hello %%{var}%%" will replace "%%{var}%%" with the actual value.
+#			   If an invalid expression is contained within a string, the original text will be returned.
 # Usage: set {_message} to parse expressions in message
 expression:
 	patterns:
-		parsed (expressions|var[iable]s) in %$strings%
-		%$strings% with (expressions|var[iable]s) parsed
+		parsed (expr[ession]s|var[iable]s) in %$strings%
+		%$strings% with (expr[ession]s|var[iable]s) parsed
 	return type: string
 	parse:
 		set {_blockingLogHandler} to new BlockingLogHandler()
@@ -160,14 +175,15 @@ expression:
 		set {_logHandler} to SkriptLogger.startLogHandler({_blockingLogHandler})
 		loop exprs-1:
 			add 1 to {_index}
-			set {_output::%{_index}%} to VariableString.newInstance(loop-value).toString(event)
-		set {_} to {_logHandler}.stop()
+			set {_output::%{_index}%} to VariableString.newInstance(loop-value).toString(event) ? loop-value
+		{_logHandler}.stop()
 		return {_output::*}
 
 # Name: Formatted numbers
 # Description: Formats the given numbers using a given decimal format.
 #              The format is constructed at parse time, therefore it must be a string literal.
-# Usage: send "Money: %formatted player's balance%"
+#			   See https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/text/DecimalFormat.html for more information.
+# Usage: send "Money: %formatted player's balance using "############,########"%"
 expression:
 	patterns:
 		formatted %$numbers% (from|with|using|as) [[decimal] format] %string%
@@ -176,13 +192,12 @@ expression:
 	parse:
 		if expr-2 is not instance of VariableString:
 			Skript.error("The decimal format must be a string literal.")
-			stop
 		else if expr-2.isSimple() is false:
 			Skript.error("The decimal format must be a string literal.")
-			stop
-		set {_decimalFormat} to try new DecimalFormat(expr-2.getSingle(null))
-		continue if {_decimalFormat} is set
-		Skript.error("Invalid decimal format: %expr-2%")
+		else:
+			set {_decimalFormat} to try new DecimalFormat(expr-2.getSingle(null))
+			continue if {_decimalFormat} is set
+			Skript.error("Invalid decimal format: %expr-2%")
 	get:
 		loop exprs-1:
 			add 1 to {_index}
@@ -191,6 +206,7 @@ expression:
 
 # Name: Ordinal number
 # Description: Ordinal numerals represent the position in a sequential order (e.g. 1st, 2nd, 3rd, etc.)
+#              For numbers less than or equal to 0, nothing is returned.
 # Usage: send "You are the %ordinal of {pos::%player%}% person in the queue."
 number property ordinal [(numeral|number|value)]:
 	return type: string
@@ -198,7 +214,8 @@ number property ordinal [(numeral|number|value)]:
 		set {_suffixes::*} to "st", "nd", "rd", "th", "th", "th", "th", "th", "th" 
 		continue
 	get:
-		return "%expr-1%%{_suffixes::%mod(expr-1, 10) if expr-1 is not 11, 12 or 13, else 0%} ? "th"%"
+		return if expr-1 <= 0
+		return join "%expr-1%" and ({_suffixes::%mod(expr-1, 10) if expr-1 is not 11, 12 or 13, else 0%} ? "th")
 
 # Name: Roman numeral
 # Description: Returns the roman numeral of a number
@@ -239,7 +256,7 @@ string property arab[ic] numeral:
 		return {_output}
 
 # Name: String with case swapped
-# Description: Swaps the case of a string. ("aaaaHEllo" will be "AAAAheLLO")
+# Description: Swaps the case of a string. For example, "aaaaHEllo" will be "AAAAheLLO".
 # Usage: send name of player with case swapped
 expression %$strings% with (swapped case|case swapped):
 	return type: strings
@@ -253,7 +270,7 @@ expression %$strings% with (swapped case|case swapped):
 # Name: Random string
 # Description: Returns a random string with a specified length using a given range of characters (alphabetic, numeric, or alphanumeric).
 # Usage: set {code::%player's uuid%} to random alphanumeric string of length 16
-expression random (alphabetic[al]|1¦numeric[al]|2¦alphanumeric[al]) [(string|text)] (of|with) length %number% [char[acter][s]]:
+expression random (alphabetic[al]|1¦numeric[al]|2¦alphanumeric[al]) [(string|text)] (of|with) [a] length [of] %number% [char[acter][s]]:
 	return type: string
 	parse:
 		set {_charset::0} to "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -275,7 +292,7 @@ expression random (alphabetic[al]|1¦numeric[al]|2¦alphanumeric[al]) [(string|t
 expression:
 	patterns:
 		[the] rounded %$numbers% (at|with|by|to) %number% decimal[s] [place[s]]
-		[the] rounded %$numbers% to [the] nearest [multiple] of %number%
+		[the] rounded %$numbers% to [the] nearest [multiple of] %number%
 	return type: numbers
 	get:
 		set {_precision} to (10 ^ (rounded down -1 * expr-2)) if pattern is 1, else expr-2
@@ -298,7 +315,8 @@ expression:
 		return product(all integers from 1 to expr-1) if expr-1 is not 0, else 1
 
 # Name: Protocol version
-# Description: Gets the protocol version of a client. (See: https://wiki.vg/Protocol_version_numbers)
+# Description: Gets the protocol version of a client. 
+#              See https://wiki.vg/Protocol_version_numbers for more information.
 # Usage: kick player due to "Nope..." if protocol version of player <= 578
 # Note: Requires Paper
 player property protocol version:
@@ -329,8 +347,8 @@ expression [a] (glowing|shiny) %$itemtypes%:
 			continue if enchantments of {_output::%{_index}%} exist	
 			enchant {_output::%{_index}%} with (lure if loop-value is not a fishing rod, else infinity)
 			set {_meta} to {_output::%{_index}%}.getItemMeta()
-			set {_} to {_meta}.addItemFlags([ItemFlag.HIDE_ENCHANTS])
-			set {_} to {_output::%{_index}%}.setItemMeta({_meta})
+			{_meta}.addItemFlags([ItemFlag.HIDE_ENCHANTS])
+			{_output::%{_index}%}.setItemMeta({_meta})
 		return {_output::*}
 
 # Name: Dyed item
@@ -363,6 +381,13 @@ expression midnight:
 		set {_calendar} to Calendar.getInstance()
 		return date(({_calendar}.get(Calendar.YEAR)), ({_calendar}.get(Calendar.MONTH) + 1), ({_calendar}.get(Calendar.DAY_OF_MONTH) + 1), 0, 0, 0, 0)
 
+# Name: Milliseconds of a timespan
+# Description: Returns the amount of milliseconds a timespan is represented by. 
+# Usage: set {_seconds} to (milliseconds of (time played of player)) / 1000		
+timespan property milliseconds:
+	return type: number
+	get:
+		return expr-1.getMilliSeconds()
 
 #         __  __          _
 #        / _|/ _|        | |
@@ -385,6 +410,23 @@ effect (destroy|despawn|remove) %entities% [(from|for) %-players%]:
 			set {_ids::%{_index}%} to loop-expression.getEntityId()
 		set int array field of {_packet} to {_ids::*}
 		send (exprs-2 ? all players) packet {_packet}
+
+# Name: Send server brand
+# Description: Sends a server brand to the given clients. This is appears in a few locations and is usually
+#              for troubleshooting. The most notable place in which the server brand is shown is the F3 menu,
+#              therefore displaying custom brands is generally for aesthethic purposes.
+# Usage: send brand "Epic" to all players
+effect (send|show) [server] brand %string% (to|for) %players%:
+    parse:
+        Bukkit.getMessenger().registerOutgoingPluginChannel(Skript.getInstance(), "minecraft:brand")
+        continue
+    trigger:
+        set {_string::*} to ...expr-1.getBytes(StandardCharsets.UTF_8)
+        loop 255 times:
+            set {_bytes::%loop-value%} to {_string::%loop-value%} ? 0
+        loop exprs-2:
+            loop-value.addChannel("minecraft:brand")
+            loop-value.sendPluginMessage(Skript.getInstance(), "minecraft:brand", [(size of {_string::*}), {_bytes::*}])
 
 #
 #   _______ _              ______           _
