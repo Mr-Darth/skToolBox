@@ -8,11 +8,10 @@
 #
 
 # Requirements:
-#   Skript (Tested with 2.6-alpha1)
+#   Skript (Tested with 2.6.1)
 #   skript-reflect (Tested with the latest build from GitHub - https://github.com/TPGamesNL/skript-reflect/actions)
-#   ThatPacketAddon (Tested with 1.0-BETA.3)
 
-# Tested on Airplane, 1.16.5
+# Tested on Paper, 1.18.1
 
 # If you encounter any issue, feel free to report it on GitHub:
 # 	https://github.com/Mr-Darth/skToolBox/issues
@@ -24,12 +23,15 @@
 
 # Imports :D!
 import:
+	java.lang.Long
+	java.lang.Character
 	java.text.DecimalFormat
 	java.util.Calendar
 	java.lang.Runnable
 	java.nio.charset.StandardCharsets
 
 	ch.njol.skript.Skript
+	ch.njol.skript.lang.Literal
 	ch.njol.skript.log.SkriptLogger
 	ch.njol.skript.log.BlockingLogHandler
 	ch.njol.skript.lang.VariableString
@@ -80,7 +82,8 @@ expression:
 # Name: Mathematical constants
 # Description: Returns the value of pi or Euler's number.
 # Usage: set {_points} to {_radius} * 2 * pi
-expression [the] [value of] (pi|π|1¦e[uler['s]] [num[ber]]):
+# Note: Slower than using a literal directly.
+expression [the] [value of] (pi|1¦e[uler['s]] [num[ber]]):
 	return type: number
 	get:
 		return 3.141592653589793 if parser mark is 0, else 2.718281828459045
@@ -110,7 +113,8 @@ expression %$numbers% ([converted] to|in) base %number%:
 expression (average|(arithmetic|1¦geometric) mean) of %numbers%:
 	return type: number
 	get:
-		return (sum(exprs-1) / size of exprs-1) if parser mark is 0, else (product(exprs-1) ^ (1 / (size of exprs-1)))
+		return (sum(exprs-1) / size of exprs-1) if parser mark is 0
+		return product(exprs-1) ^ (1 / (size of exprs-1))
 
 # Name: Reversed strings
 # Description: Reverses the given strings.
@@ -133,20 +137,19 @@ plural expression:
 		split %string% [(by|at)] every %number% char[acter][s]
 	return type: strings
 	get:
-		return expr-1 if expr-2 < 0, else (regex split expr-1 by "(?<=\G.{%expr-2%})(?!$)")
+		return expr-1 if expr-2 ? 0 <= 0, else (regex split expr-1 by "(?<=\G.{%expr-2%})(?!$)")
 
 # Name: Soundex value
-# Description: Returns the soundex value of a string. 
-#              See https://en.wikipedia.org/wiki/Soundex for more information.
+# Description: Returns the soundex value of a string. (See: https://en.wikipedia.org/wiki/Soundex)
 # Usage: send "Use `command` not `%arg-1%`" if soundex value of "command" is soundex value of arg-1
 string property soundex [value]:
 	return type: string
 	get:
-		return "" if expr-1 ? "" is empty
+		return if expr-1 ? "" is empty
 		set {_input} to capitalized expr-1
 		set {_output} to first character of {_input}
 		loop characters at (integers from 2 to (length of {_input} + 1)) in {_input}:
-			return {_output} if length of {_output} >= 4  
+			return {_output} if length of {_output} >= 4
 			set {_digit} to character at (index of loop-value in "ABCDEFGHIJKLMNOPQRSTUVWXYZ") in "01230120022455012623010202"
 			{_digit} is not "0" or last character of {_output}
 			set {_output} to join {_output} and {_digit}
@@ -171,15 +174,12 @@ expression [the] [(number|amount) of] (occurrences|repetitions) of %string% in %
 # Usage: set {_message} to parse expressions in message
 expression:
 	patterns:
-		parsed (expr[ession]s|var[iable]s) in %$strings%
-		%$strings% with (expr[ession]s|var[iable]s) parsed
+		parsed (expressions|variables) in %$strings%
+		%$strings% with (expressions|variables) parsed
 	return type: string
-	parse:
-		set {_blockingLogHandler} to new BlockingLogHandler()
-		continue
 	get:
 		# Start a blocking log handler to block errors from invalid expressions
-		set {_logHandler} to SkriptLogger.startLogHandler({_blockingLogHandler})
+		set {_logHandler} to SkriptLogger.startLogHandler(new BlockingLogHandler())
 		loop exprs-1:
 			add 1 to {_index}
 			set {_output::%{_index}%} to VariableString.newInstance(loop-value).toString(event) ? loop-value
@@ -199,8 +199,10 @@ expression:
 	parse:
 		if expr-2 is not instance of VariableString:
 			Skript.error("The decimal format must be a string literal.")
+			stop
 		else if expr-2.isSimple() is false:
 			Skript.error("The decimal format must be a string literal.")
+			stop
 		else:
 			set {_decimalFormat} to try new DecimalFormat(expr-2.getSingle(null))
 			continue if {_decimalFormat} is set
@@ -218,7 +220,7 @@ expression:
 number property ordinal [(numeral|number|value)]:
 	return type: string
 	parse:
-		set {_suffixes::*} to "st", "nd", "rd", "th", "th", "th", "th", "th", "th" 
+		set {_suffixes::*} to "st", "nd", "rd", "th", "th", "th", "th", "th", "th"
 		continue
 	get:
 		return if expr-1 <= 0
@@ -322,7 +324,7 @@ expression:
 		return product(all integers from 1 to expr-1) if expr-1 is not 0, else 1
 
 # Name: Protocol version
-# Description: Gets the protocol version of a client. 
+# Description: Gets the protocol version of a client.
 #              See https://wiki.vg/Protocol_version_numbers for more information.
 # Usage: kick player due to "Nope..." if protocol version of player <= 578
 # Note: Requires Paper
@@ -351,7 +353,7 @@ expression [a] (glowing|shiny) %$itemtypes%:
 		loop exprs-1:
 			add 1 to {_index}
 			set {_output::%{_index}%} to loop-value
-			continue if enchantments of {_output::%{_index}%} exist	
+			continue if enchantments of {_output::%{_index}%} exist
 			enchant {_output::%{_index}%} with (lure if loop-value is not a fishing rod, else infinity)
 			set {_meta} to {_output::%{_index}%}.getItemMeta()
 			{_meta}.addItemFlags([ItemFlag.HIDE_ENCHANTS])
@@ -376,7 +378,8 @@ expression %$itemtypes% (colo[u]red|dyed|painted) %color%:
 expression time until %date%:
 	return type: timespan
 	get:
-		return difference between now and expr-1 if expr-1 >= now
+		set {_date} to expr-1
+		return difference between now and {_date} if {_date} >= now
 		return
 
 # Name: Midnight
@@ -389,8 +392,8 @@ expression midnight:
 		return date(({_calendar}.get(Calendar.YEAR)), ({_calendar}.get(Calendar.MONTH) + 1), ({_calendar}.get(Calendar.DAY_OF_MONTH) + 1), 0, 0, 0, 0)
 
 # Name: Milliseconds of a timespan
-# Description: Returns the amount of milliseconds a timespan is represented by. 
-# Usage: set {_seconds} to (milliseconds of (time played of player)) / 1000		
+# Description: Returns the amount of milliseconds a timespan is represented by.
+# Usage: set {_seconds} to (milliseconds of (time played of player)) / 1000
 timespan property milliseconds:
 	return type: number
 	get:
@@ -403,20 +406,6 @@ timespan property milliseconds:
 #  |  __/ | | ||  __/ (__| |_\__ \
 #   \___|_| |_| \___|\___|\__|___/
 #
-
-# Name: Despawn entity
-# Description: Despawns the given entities for certain players.
-# Usage: destroy player's targeted entity for (all players in radius 10 of player)
-effect (destroy|despawn|remove) %entities% [(from|for) %-players%]:
-	parse:
-		set {_packet} to new play_server_entity_destroy packet
-		continue
-	trigger:
-		loop exprs-1:
-			add 1 to {_index}
-			set {_ids::%{_index}%} to loop-expression.getEntityId()
-		set int array field of {_packet} to {_ids::*}
-		send (exprs-2 ? all players) packet {_packet}
 
 # Name: Send server brand
 # Description: Sends a server brand to the given clients. This is appears in a few locations and is usually
@@ -434,6 +423,15 @@ effect (send|show) [server] brand %string% (to|for) %players%:
         loop exprs-2:
             loop-value.addChannel("minecraft:brand")
             loop-value.sendPluginMessage(Skript.getInstance(), "minecraft:brand", [(size of {_string::*}), {_bytes::*}])
+
+# Name: Call function
+# Description: Dynamically calls a function with the given arguments.
+#              Optionally the function may be called asynchronously (i.e. not on the server thread).
+#              You may not use anything that is part of the Bukkit API on another thread.
+# Usage: call function "sendMsgToStaff" with args "hello there"
+effect (call|run|execute) function %string% [(1¦async[hronously])] [(with|using) [[the] arg[ument][s]] %-objects%]:
+	trigger:
+		# add logic
 
 #
 #   _______ _              ______           _
